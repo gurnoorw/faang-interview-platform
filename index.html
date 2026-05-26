@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FAANG Mock Interview Platform</title>
+
+  <!-- Tabler Icons (outline) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/tabler-icons.min.css"/>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/base.css"/>
+  <link rel="stylesheet" href="css/home.css"/>
+  <link rel="stylesheet" href="css/room.css"/>
+  <link rel="stylesheet" href="css/feedback.css"/>
+  <link rel="stylesheet" href="css/airound.css"/>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     HOME SCREEN
+     Interviewee mode: round selector + problem picker
+     Interviewer mode: question bank manager (all 5 round types)
+══════════════════════════════════════════════════════════════════════ -->
+<div id="home" class="screen active">
+  <div class="home-inner">
+
+    <!-- Header -->
+    <div>
+      <div class="home-tag">SDE-3 · FAANG Prep · Bangalore</div>
+      <div class="home-h1">Mock Interview Platform</div>
+    </div>
+
+    <!-- Mode toggle -->
+    <div class="mode-toggle">
+      <button class="mode-btn active" onclick="setMode('interviewee',this)">
+        <i class="ti ti-user" aria-hidden="true"></i> Interviewee Mode
+      </button>
+      <button class="mode-btn" onclick="setMode('interviewer',this)">
+        <i class="ti ti-settings" aria-hidden="true"></i> Interviewer Mode
+      </button>
+    </div>
+
+    <!-- ── INTERVIEWEE HOME ── -->
+    <div id="interviewee-home">
+
+      <!-- Round tabs -->
+      <div>
+        <div style="font-size:0.72rem;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;font-weight:600">Select round type</div>
+        <div class="round-tabs">
+          <button class="rtab active"  onclick="selectRound('DSA',this)">⚡ DSA</button>
+          <button class="rtab"         onclick="selectRound('HLD',this)">🏗️ High-Level Design</button>
+          <button class="rtab"         onclick="selectRound('LLD',this)">🔧 Low-Level Design</button>
+          <button class="rtab"         onclick="selectRound('BEH',this)">💬 Behavioural</button>
+          <button class="rtab"         onclick="selectRound('AI',this)">🤖 AI Knowledge</button>
+        </div>
+      </div>
+
+      <!-- Problem picker -->
+      <div>
+        <div style="font-size:0.72rem;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;font-weight:600" id="pick-label">Select a problem</div>
+        <div class="prob-grid" id="prob-grid"></div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+        <button class="start-btn" id="start-btn" onclick="launchInterview()" disabled>Start Interview →</button>
+        <span style="font-size:0.72rem;color:var(--mut)" id="sel-info">Select a problem above</span>
+      </div>
+
+    </div><!-- /interviewee-home -->
+
+    <!-- ── INTERVIEWER HOME ── -->
+    <div id="interviewer-home">
+
+      <!-- Tab row -->
+      <div class="iv-tab-row">
+        <button class="iv-tab active" onclick="ivTabSwitch('dsa',this)">DSA</button>
+        <button class="iv-tab"        onclick="ivTabSwitch('hld',this)">HLD</button>
+        <button class="iv-tab"        onclick="ivTabSwitch('lld',this)">LLD</button>
+        <button class="iv-tab"        onclick="ivTabSwitch('beh',this)">Behavioural</button>
+        <button class="iv-tab"        onclick="ivTabSwitch('ai',this)">AI Topics</button>
+      </div>
+
+      <!-- ─── DSA panel ─── -->
+      <div class="iv-panel" id="iv-panel-dsa" style="display:flex">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--acc2)">Question bank</div>
+        <div id="qlist-DSA"></div>
+
+        <!-- LeetCode import -->
+        <div class="add-form">
+          <div class="add-form-title">Import from LeetCode</div>
+          <div class="lc-import-hint">
+            1. Open the LeetCode problem in your browser<br>
+            2. Paste the problem URL below<br>
+            3. Copy-paste the full problem description text into the box
+          </div>
+          <div class="form-row">
+            <div class="form-field" style="flex:2">
+              <label>LeetCode URL</label>
+              <input id="lc-url" type="url" placeholder="https://leetcode.com/problems/two-sum/"/>
+            </div>
+            <div class="form-field">
+              <label>Difficulty</label>
+              <select id="lc-difficulty"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select>
+            </div>
+            <div class="form-field" style="max-width:80px">
+              <label>Time (min)</label>
+              <input id="lc-time" type="number" value="45" min="15" max="90"/>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Paste problem description</label>
+            <textarea id="lc-paste" rows="4" placeholder="Paste the full problem statement here..."></textarea>
+          </div>
+          <button class="add-btn" onclick="importLeetcodeUrl()">Import LeetCode Problem →</button>
+        </div>
+
+        <!-- Custom DSA -->
+        <div class="add-form">
+          <div class="add-form-title">Add custom DSA question</div>
+          <div class="form-row">
+            <div class="form-field" style="flex:2"><label>Title</label><input id="cdsa-title" placeholder="e.g. Two Sum"/></div>
+            <div class="form-field"><label>Difficulty</label><select id="cdsa-diff"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select></div>
+            <div class="form-field"><label>Topic</label><input id="cdsa-topic" placeholder="Arrays"/></div>
+            <div class="form-field" style="max-width:80px"><label>Time (min)</label><input id="cdsa-time" type="number" value="45"/></div>
+          </div>
+          <div class="form-field"><label>Problem description</label><textarea id="cdsa-desc" rows="4" placeholder="Full problem statement..."></textarea></div>
+          <div class="form-field"><label>Test cases (one per line: input | expected)</label><textarea id="cdsa-tests" rows="3" placeholder="[2,7,11,15], target=9 | [0,1]"></textarea></div>
+          <div class="form-field"><label>AI interviewer system prompt (optional)</label><textarea id="cdsa-sys" rows="3" placeholder="Leave blank to auto-generate. Or: 'You are Priya from Amazon. Probe for...'"></textarea></div>
+          <button class="add-btn" onclick="addCustomDSA()">Add DSA Question →</button>
+        </div>
+      </div>
+
+      <!-- ─── HLD panel ─── -->
+      <div class="iv-panel" id="iv-panel-hld">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--acc2)">Question bank</div>
+        <div id="qlist-HLD"></div>
+        <div class="add-form">
+          <div class="add-form-title">Add HLD question</div>
+          <div class="form-row">
+            <div class="form-field" style="flex:2"><label>Title</label><input id="hld-title" placeholder="Design WhatsApp"/></div>
+            <div class="form-field"><label>Difficulty</label><select id="hld-diff"><option value="medium" selected>Medium</option><option value="hard">Hard</option></select></div>
+            <div class="form-field" style="max-width:80px"><label>Time (min)</label><input id="hld-time" type="number" value="55"/></div>
+          </div>
+          <div class="form-field"><label>Problem description (scope, NFRs, constraints)</label><textarea id="hld-desc" rows="4" placeholder="Design WhatsApp for 2B users. In-scope: messaging, delivery receipts, media. NFRs: &lt;100ms message delivery P99..."></textarea></div>
+          <div class="form-field"><label>Expected coverage (one bullet per line)</label><textarea id="hld-coverage" rows="4" placeholder="Back-of-envelope QPS and storage&#10;Message routing and fan-out&#10;Media storage strategy&#10;End-to-end encryption design"></textarea></div>
+          <div class="form-field"><label>NFRs (one per line)</label><textarea id="hld-nfrs" rows="2" placeholder="2B users, ~100B messages/day&#10;Message delivery &lt;100ms P99"></textarea></div>
+          <div class="form-field" style="flex-direction:row;align-items:center;gap:8px">
+            <input id="hld-whiteboard" type="checkbox" checked style="width:auto"/>
+            <label for="hld-whiteboard" style="text-transform:none;font-size:0.76rem">Enable whiteboard for this question</label>
+          </div>
+          <div class="form-field"><label>AI interviewer behaviour (optional — defines how aggressive/what to probe)</label><textarea id="hld-sys" rows="3" placeholder="Leave blank to auto-generate a FAANG-style interviewer for this problem."></textarea></div>
+          <button class="add-btn" onclick="addDesignQuestion('HLD')">Add HLD Question →</button>
+        </div>
+      </div>
+
+      <!-- ─── LLD panel ─── -->
+      <div class="iv-panel" id="iv-panel-lld">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--acc2)">Question bank</div>
+        <div id="qlist-LLD"></div>
+        <div class="add-form">
+          <div class="add-form-title">Add LLD question</div>
+          <div class="form-row">
+            <div class="form-field" style="flex:2"><label>Title</label><input id="lld-title" placeholder="Design a Chess Game"/></div>
+            <div class="form-field"><label>Difficulty</label><select id="lld-diff"><option value="medium" selected>Medium</option><option value="hard">Hard</option></select></div>
+            <div class="form-field" style="max-width:80px"><label>Time (min)</label><input id="lld-time" type="number" value="55"/></div>
+          </div>
+          <div class="form-field"><label>Problem description</label><textarea id="lld-desc" rows="4" placeholder="Design a Chess game supporting two players. Features: valid move validation, check/checkmate detection, castling, en passant..."></textarea></div>
+          <div class="form-field"><label>Expected coverage / design requirements</label><textarea id="lld-coverage" rows="4" placeholder="SOLID principles throughout&#10;State machine for game status&#10;Piece class hierarchy&#10;Thread-safe concurrent moves"></textarea></div>
+          <div class="form-field"><label>NFRs / constraints</label><textarea id="lld-nfrs" rows="2" placeholder="Support concurrent games&#10;Move validation O(1)"></textarea></div>
+          <div class="form-field" style="flex-direction:row;align-items:center;gap:8px">
+            <input id="lld-whiteboard" type="checkbox" checked style="width:auto"/>
+            <label for="lld-whiteboard" style="text-transform:none;font-size:0.76rem">Enable whiteboard</label>
+          </div>
+          <div class="form-field"><label>AI interviewer system prompt (optional)</label><textarea id="lld-sys" rows="3" placeholder="Leave blank to auto-generate."></textarea></div>
+          <button class="add-btn" onclick="addDesignQuestion('LLD')">Add LLD Question →</button>
+        </div>
+      </div>
+
+      <!-- ─── BEH panel ─── -->
+      <div class="iv-panel" id="iv-panel-beh">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--acc2)">Question bank (randomly selected each session)</div>
+        <div id="qlist-BEH"></div>
+        <div class="add-form">
+          <div class="add-form-title">Add behavioural question</div>
+          <div class="form-field"><label>Short title / category</label><input id="beh-title" placeholder="Conflict Resolution"/></div>
+          <div class="form-field"><label>Question text</label><textarea id="beh-question" rows="3" placeholder="Tell me about a time you had to resolve a conflict between two senior engineers on your team."></textarea></div>
+          <div class="form-field"><label>Probing follow-ups (one per line)</label><textarea id="beh-probes" rows="3" placeholder="What was your specific role in the resolution?&#10;Who had the higher title — how did that affect things?&#10;What was the outcome and how did you measure success?"></textarea></div>
+          <div class="form-field"><label>SDE-3 signals to look for (one per line)</label><textarea id="beh-signals" rows="2" placeholder="Cross-team influence&#10;Data-driven resolution&#10;Organisational maturity"></textarea></div>
+          <div class="form-field"><label>AI interviewer system prompt (optional)</label><textarea id="beh-sys" rows="3" placeholder="Leave blank to auto-generate a FAANG EM for this question."></textarea></div>
+          <button class="add-btn" onclick="addBehQuestion()">Add Behavioural Question →</button>
+        </div>
+      </div>
+
+      <!-- ─── AI panel ─── -->
+      <div class="iv-panel" id="iv-panel-ai">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--acc2)">AI knowledge topics</div>
+        <div id="qlist-AI"></div>
+        <div class="add-form">
+          <div class="add-form-title">Add AI knowledge topic</div>
+          <div class="form-field"><label>Topic title</label><input id="ai-topic-title" placeholder="e.g. Reinforcement Learning"/></div>
+          <div class="form-field"><label>Subtopics (one per line — questions auto-generated from these)</label><textarea id="ai-subtopics" rows="5" placeholder="Policy gradient methods&#10;Q-learning and DQN&#10;Reward shaping&#10;Multi-agent RL&#10;Model-based vs model-free"></textarea></div>
+          <div style="font-size:0.7rem;color:var(--mut);line-height:1.5;background:rgba(124,111,255,0.05);border:1px solid rgba(124,111,255,0.12);border-radius:6px;padding:8px">
+            Questions at 5 difficulty levels (Fundamentals → Application) will be auto-generated from your subtopics. Model solutions are always shown — this is a learning round.
+          </div>
+          <button class="add-btn" onclick="addAITopic()">Add AI Topic →</button>
+        </div>
+      </div>
+
+    </div><!-- /interviewer-home -->
+
+  </div><!-- /home-inner -->
+</div><!-- /home -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     ROOM SCREEN
+     3-column layout: [interviewer+chat] [tabs+content] [live eval]
+══════════════════════════════════════════════════════════════════════ -->
+<div id="room" class="screen">
+
+  <!-- Loading overlay -->
+  <div id="rlov" class="lov hid">
+    <div class="sp"></div>
+    <div class="lt" id="rl-msg">Connecting...</div>
+  </div>
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <button class="bk" onclick="goHome()" title="Back to home">←</button>
+    <span class="rbadge" id="rh-badge">DSA</span>
+    <span class="qtit" id="rh-q">Loading...</span>
+    <span class="tmr" id="tmr">45:00</span>
+    <button class="endb" onclick="endInterview()">End &amp; Evaluate</button>
+  </div>
+
+  <div class="room-body">
+
+    <!-- ── LEFT: Interviewer + Camera + Chat ── -->
+    <div class="iv-col">
+      <div class="iv-top">
+
+        <!-- Interviewer avatar + name -->
+        <div class="iv-row">
+          <div class="iv-av">
+            <span id="iv-emo">🤖</span>
+            <div class="iv-pulse" aria-hidden="true"></div>
+          </div>
+          <div>
+            <div class="iv-nm" id="iv-nm">Interviewer</div>
+            <div class="iv-rl" id="iv-rl">Loading...</div>
+          </div>
+        </div>
+
+        <!-- Camera feed (local only — never transmitted) -->
+        <div class="cam-wrap" id="cam-wrap" role="img" aria-label="Local camera feed">
+          <video id="vid" autoplay muted playsinline></video>
+          <div class="cam-ph" id="cam-ph">
+            <i class="ti ti-video-off" aria-hidden="true"></i>
+            <span>Camera off</span>
+          </div>
+          <div class="rec-b" id="rec-b" aria-label="Recording indicator">
+            <span class="rdot" aria-hidden="true"></span>REC
+          </div>
+          <div class="cam-ctl">
+            <button class="cbtn" onclick="toggleCam()" aria-label="Toggle camera">
+              <i class="ti ti-video" style="font-size:10px" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Status badge -->
+        <div class="iv-status s-watch" id="iv-st" aria-live="polite">
+          <div class="sdot" aria-hidden="true"></div>
+          <span id="iv-st-txt">Watching your approach...</span>
+        </div>
+
+      </div>
+
+      <!-- Chat messages -->
+      <div class="chat-zone" id="chat" aria-live="polite" aria-label="Chat with interviewer"></div>
+
+      <!-- Message input -->
+      <div class="inp-row">
+        <input class="cinp" id="cinp"
+               placeholder="Respond to interviewer..."
+               onkeydown="onInputKeydown(event)"
+               aria-label="Message input"/>
+        <button class="micb" id="micb" onclick="toggleMic()" aria-label="Toggle microphone">
+          <i class="ti ti-microphone" style="font-size:12px" aria-hidden="true"></i>
+        </button>
+        <button class="sndb" onclick="sendMsg()" aria-label="Send message">↑</button>
+      </div>
+    </div>
+
+    <!-- ── CENTER: Tabs + Content ── -->
+    <div class="ctr-col">
+
+      <!-- Tab row -->
+      <div class="tab-row">
+        <div class="tab active" id="t-prob" role="tab" onclick="roomTabSwitch('prob',this)">
+          <i class="ti ti-file-text" style="font-size:12px" aria-hidden="true"></i>Problem
+        </div>
+        <div class="tab" id="t-code" role="tab" onclick="roomTabSwitch('code',this)">
+          <i class="ti ti-code" style="font-size:12px" aria-hidden="true"></i>Code
+        </div>
+        <div class="tab" id="t-wb" role="tab" onclick="roomTabSwitch('wb',this)">
+          <i class="ti ti-pencil" style="font-size:12px" aria-hidden="true"></i>Whiteboard
+        </div>
+        <!-- AI round tab — shown only during AI rounds -->
+        <div class="tab" id="t-ai" role="tab" onclick="roomTabSwitch('ai',this)" style="display:none">
+          <i class="ti ti-brain" style="font-size:12px" aria-hidden="true"></i>AI Round
+        </div>
+      </div>
+
+      <div class="pbody">
+
+        <!-- Problem description pane -->
+        <div class="pane active" id="pp" style="overflow-y:auto;padding:1rem;gap:0.65rem">
+          <div id="prob-content"></div>
+        </div>
+
+        <!-- Code editor pane -->
+        <div class="pane" id="pc">
+          <div class="cbar">
+            <select class="lsel" id="lsel" onchange="onLanguageChange()" aria-label="Programming language">
+              <option value="python">Python 3</option>
+              <option value="java">Java</option>
+              <option value="cpp">C++</option>
+              <option value="javascript">JavaScript</option>
+            </select>
+            <button class="rbtn" onclick="runCodeSimulate()">▶ Run</button>
+            <button class="sbtn" onclick="ROOM.submitCode()">Submit ↗</button>
+          </div>
+          <div class="edwrap">
+            <div class="lns" id="lns" aria-hidden="true">1</div>
+            <textarea id="ced"
+                      spellcheck="false"
+                      oninput="updateLineNumbers(); ROOM.updateLastActivity();"
+                      onscroll="syncEditorScroll()"
+                      aria-label="Code editor"></textarea>
+          </div>
+          <!-- Live code review strip -->
+          <div class="cr-strip" id="cr-strip">
+            <div class="crh">
+              <i class="ti ti-eye" style="font-size:11px" aria-hidden="true"></i>
+              Live code review
+            </div>
+            <div class="cri-wrap" id="cri-wrap">
+              <div style="font-size:0.7rem;color:var(--mut);padding:3px">Start coding — interviewer watching...</div>
+            </div>
+          </div>
+          <!-- Console output -->
+          <div id="outbox">
+            <div class="outh">
+              <span class="od" style="background:#ef4444" aria-hidden="true"></span>
+              <span class="od" style="background:#f59e0b" aria-hidden="true"></span>
+              <span class="od" style="background:#22c55e" aria-hidden="true"></span>
+              <span style="margin-left:5px">Console</span>
+            </div>
+            <div id="otxt">Run your code to see output...</div>
+          </div>
+        </div>
+
+        <!-- Whiteboard pane -->
+        <div class="pane" id="pw" style="background:#f8f8f0;position:relative">
+          <div class="wb-bar" role="toolbar" aria-label="Whiteboard tools">
+            <button class="wbt active" onclick="setWbTool('pen',this)"    title="Pen">✏️</button>
+            <button class="wbt"        onclick="setWbTool('rect',this)"   title="Rectangle">⬜</button>
+            <button class="wbt"        onclick="setWbTool('circle',this)" title="Circle">⬭</button>
+            <button class="wbt"        onclick="setWbTool('arrow',this)"  title="Arrow">→</button>
+            <button class="wbt"        onclick="setWbTool('text',this)"   title="Text">T</button>
+            <button class="wbt"        onclick="setWbTool('erase',this)"  title="Eraser">🧹</button>
+            <div class="wbs" aria-hidden="true"></div>
+            <div class="wbc2 sel" style="background:#222"    onclick="setWbColor('#222',this)"    title="Black" role="radio" aria-checked="true"></div>
+            <div class="wbc2"     style="background:#6c63ff" onclick="setWbColor('#6c63ff',this)" title="Purple"></div>
+            <div class="wbc2"     style="background:#ef4444" onclick="setWbColor('#ef4444',this)" title="Red"></div>
+            <div class="wbc2"     style="background:#22c55e" onclick="setWbColor('#22c55e',this)" title="Green"></div>
+            <div class="wbc2"     style="background:#f59e0b" onclick="setWbColor('#f59e0b',this)" title="Amber"></div>
+            <div class="wbs" aria-hidden="true"></div>
+            <input type="range" id="wsz" min="1" max="20" value="2" step="1"
+                   style="width:40px" aria-label="Brush size"/>
+            <div class="wbs" aria-hidden="true"></div>
+            <button class="wbt" onclick="clearWhiteboard()" title="Clear all">🗑️</button>
+          </div>
+          <canvas id="wbc" aria-label="Whiteboard canvas"></canvas>
+        </div>
+
+        <!-- AI Round pane -->
+        <div class="pane" id="pw-ai" style="overflow-y:auto;padding:1rem;gap:0.75rem;background:var(--bg);flex-direction:column">
+
+          <!-- Progress track -->
+          <div class="ai-progress-wrap">
+            <div class="ai-progress-label">Learning progress</div>
+            <div id="ai-level-lbl">🟢 Level 1 — Fundamentals</div>
+            <div id="ai-progress"></div>
+          </div>
+
+          <!-- Question card -->
+          <div class="ai-q-card">
+            <div class="ai-q-label">Question</div>
+            <div id="ai-question-text">Loading question...</div>
+          </div>
+
+          <!-- Loading spinner -->
+          <div id="ai-loading">
+            <div class="sp" style="width:18px;height:18px;border-width:1.5px"></div>
+            <span>Evaluating your answer...</span>
+          </div>
+
+          <!-- Answer input -->
+          <div id="ai-answer-area" style="display:flex;flex-direction:column;gap:8px">
+            <textarea id="ai-answer-input"
+                      placeholder="Type your answer here. Speak aloud or type — this is a learning round, solutions are always shown."
+                      aria-label="Your answer"></textarea>
+            <button class="ai-submit-btn" onclick="AI_ROUND.submitAnswer(document.getElementById('ai-answer-input').value)">
+              Submit Answer →
+            </button>
+          </div>
+
+          <!-- Solution area -->
+          <div id="ai-solution-area" style="display:none;flex-direction:column;gap:10px">
+            <div id="ai-verdict" class="ai-verdict correct">✓ Correct</div>
+            <div id="ai-feedback"></div>
+
+            <div class="ai-sol-card">
+              <div class="ai-sol-label">Model solution</div>
+              <div id="ai-solution-text"></div>
+            </div>
+
+            <div class="ai-kp-card">
+              <div class="ai-kp-label">Key points to remember</div>
+              <ul id="ai-key-points"></ul>
+            </div>
+
+            <div class="ai-pro-tip">
+              <div class="ai-pro-tip-label">Pro tip</div>
+              <div id="ai-pro-tip"></div>
+            </div>
+
+            <button class="ai-next-btn" onclick="AI_ROUND.nextQuestion()">Next Question →</button>
+          </div>
+
+        </div><!-- /pw-ai -->
+
+      </div><!-- /pbody -->
+    </div><!-- /ctr-col -->
+
+    <!-- ── RIGHT: Live Eval ── -->
+    <div class="ev-col">
+      <div class="evh"><span class="ldot" aria-hidden="true"></span>Live tracking</div>
+      <div class="evb">
+
+        <div class="evm">
+          <div class="eml">Problem solving</div>
+          <div class="ems sm" id="sc-ps">—</div>
+          <div class="embar"><div class="emf fm" id="fl-ps" style="width:0%"></div></div>
+          <div class="emn" id="nt-ps">Watching...</div>
+        </div>
+
+        <div class="evm">
+          <div class="eml">Communication</div>
+          <div class="ems sm" id="sc-cm">—</div>
+          <div class="embar"><div class="emf fm" id="fl-cm" style="width:0%"></div></div>
+          <div class="emn" id="nt-cm">Start explaining</div>
+        </div>
+
+        <div class="evm">
+          <div class="eml">Code / Design quality</div>
+          <div class="ems sm" id="sc-cq">—</div>
+          <div class="embar"><div class="emf fm" id="fl-cq" style="width:0%"></div></div>
+          <div class="emn" id="nt-cq">Write code to evaluate</div>
+        </div>
+
+        <div class="evm">
+          <div class="eml">Time management</div>
+          <div class="ems sg" id="sc-tm">Good</div>
+          <div class="embar"><div class="emf fg" id="fl-tm" style="width:78%"></div></div>
+          <div class="emn" id="nt-tm">On track</div>
+        </div>
+
+        <div class="pz">
+          <div class="pzl">Interview pressure</div>
+          <div class="pzbar"><div class="pzf pz-lo" id="pzf" style="width:18%"></div></div>
+          <div class="pzlbl pz-lo" id="pzlbl">Low — warming up</div>
+        </div>
+
+        <!-- Speech waveform -->
+        <div class="evm" style="padding:0.45rem">
+          <div class="eml" style="margin-bottom:5px">Speech</div>
+          <div class="wvfrm" id="wvfrm" aria-hidden="true">
+            <div class="wb3"></div><div class="wb3"></div><div class="wb3"></div>
+            <div class="wb3"></div><div class="wb3"></div><div class="wb3"></div>
+            <div class="wb3"></div><div class="wb3"></div><div class="wb3"></div>
+            <div class="wb3"></div><div class="wb3"></div><div class="wb3"></div>
+          </div>
+          <div class="spst">
+            <div class="ss"><div class="ssn" id="wpm">—</div><div class="ssl">WPM</div></div>
+            <div class="ss"><div class="ssn" id="fill">—</div><div class="ssl">Fillers</div></div>
+          </div>
+        </div>
+
+      </div><!-- /evb -->
+    </div><!-- /ev-col -->
+
+  </div><!-- /room-body -->
+</div><!-- /room -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     FEEDBACK SCREEN
+══════════════════════════════════════════════════════════════════════ -->
+<div id="feedback" class="screen">
+  <div class="fb-hero">
+    <div class="fb-ring" role="img" aria-label="Score ring">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#252540" stroke-width="8"/>
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#7c6fff" stroke-width="8"
+                stroke-dasharray="251.2" id="rp"
+                stroke-dashoffset="100" stroke-linecap="round"/>
+      </svg>
+      <div class="fb-ring-in">
+        <div class="fb-ring-n" id="fb-n">—</div>
+        <div class="fb-ring-l">/100</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:0.68rem;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px" id="fb-round-lbl">DSA Round</div>
+      <div class="fb-verdict" id="fb-verd">Evaluating...</div>
+      <div class="fb-sum" id="fb-sum">Loading detailed feedback...</div>
+    </div>
+  </div>
+
+  <div class="fb-body" id="fb-body"></div>
+
+  <div class="fb-actions">
+    <button class="fba fba-p" onclick="retryRound()">Retry this problem</button>
+    <button class="fba fba-g" onclick="goHome()">Pick another problem</button>
+    <button class="fba fba-g" onclick="exportFeedbackReport()">Export report</button>
+  </div>
+</div><!-- /feedback -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     GLOBAL UI: Edit modal + Toast
+══════════════════════════════════════════════════════════════════════ -->
+<div id="edit-modal" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+  <div class="edit-modal-inner">
+    <div class="edit-modal-title" id="edit-modal-title">Edit question</div>
+    <div id="edit-fields"></div>
+    <div class="edit-modal-actions">
+      <button class="em-btn em-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="em-btn em-save"   onclick="saveEdit()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SCRIPTS — load order matters:
+     config → api → questions → [feature modules] → app
+══════════════════════════════════════════════════════════════════════ -->
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/questions.js"></script>
+<script src="js/media.js"></script>
+<script src="js/whiteboard.js"></script>
+<script src="js/airound.js"></script>
+<script src="js/feedback.js"></script>
+<script src="js/interviewer.js"></script>
+<script src="js/room.js"></script>
+<script src="js/app.js"></script>
+
+<!-- Inline glue: small helpers that don't warrant their own file -->
+<script>
+/**
+ * runCodeSimulate — simulate code execution via Claude.
+ * Runs in O(1) DOM ops; result displayed in #otxt.
+ */
+async function runCodeSimulate() {
+  const code = document.getElementById('ced').value;
+  const lang = document.getElementById('lsel').value;
+  const out  = document.getElementById('otxt');
+  if (!code.trim()) { out.textContent = '$ No code to run.'; return; }
+
+  out.style.color = '#888';
+  out.textContent = '$ Running...';
+
+  const prob = ROOM.problem;
+  const r = await callClaude(
+    [{ role: 'user', content: `Simulate running this ${lang} code${prob ? ` for "${prob.title}"` : ''}. Show realistic output (3-5 lines):\n${code.substring(0,500)}` }],
+    'Code execution simulator. Output only — no explanation. 3-5 lines max.'
+  );
+  out.style.color = '#aaffaa';
+  out.textContent = r ? `$ ${r}` : '$ (no output — add test cases or print statements)';
+}
+</script>
+
+</body>
+</html>

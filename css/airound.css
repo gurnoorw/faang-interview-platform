@@ -1,0 +1,93 @@
+/**
+ * airound.css — AI Knowledge Round pane styles
+ */
+
+#pw-ai {
+  display: flex; flex-direction: column; overflow-y: auto;
+  padding: 1rem; gap: 0.75rem; background: var(--bg);
+}
+
+/* Progress track */
+.ai-progress-wrap { background: var(--bg2); border: 1px solid var(--bdr); border-radius: 10px; padding: 0.85rem; }
+.ai-progress-label { font-size: 0.62rem; color: var(--mut); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+#ai-level-lbl { font-size: 0.8rem; font-weight: 700; color: var(--acc2); margin-bottom: 8px; }
+#ai-progress { display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
+.ai-dot {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--bdr); background: var(--bg3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: var(--mut);
+  transition: all 0.3s;
+}
+.ai-dot.done   { background: var(--grn); border-color: var(--grn); color: white; }
+.ai-dot.active { background: var(--acc); border-color: var(--acc); color: white; animation: pu 1.5s infinite; }
+.ai-line { flex: 1; height: 2px; background: var(--bdr); min-width: 12px; transition: background 0.3s; }
+.ai-line.done { background: var(--grn); }
+.ai-mini-row { display: flex; gap: 4px; margin-top: 8px; }
+.ai-mini { width: 8px; height: 8px; border-radius: 50%; background: var(--bg4); border: 1px solid var(--bdr); transition: all 0.2s; }
+.ai-mini.filled { background: var(--acc); border-color: var(--acc); }
+
+/* Question card */
+.ai-q-card { background: var(--bg2); border: 1px solid var(--bdr); border-radius: 10px; padding: 0.85rem; }
+.ai-q-label { font-size: 0.62rem; color: var(--acc2); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 6px; }
+#ai-question-text { font-size: 0.85rem; line-height: 1.65; color: var(--txt); font-weight: 500; }
+
+/* Answer area */
+#ai-answer-area { display: flex; flex-direction: column; gap: 8px; }
+#ai-answer-input {
+  width: 100%; background: var(--bg2); border: 1px solid var(--bdr);
+  border-radius: 8px; color: var(--txt); font-family: var(--sans);
+  font-size: 0.8rem; padding: 10px; outline: none; resize: vertical;
+  transition: border-color 0.15s; min-height: 100px;
+}
+#ai-answer-input:focus { border-color: var(--acc); }
+#ai-answer-input::placeholder { color: var(--mut); }
+.ai-submit-btn {
+  background: var(--acc); border: none; color: white;
+  font-family: var(--sans); font-size: 0.8rem; font-weight: 600;
+  padding: 9px 20px; border-radius: 8px; cursor: pointer;
+  transition: all 0.15s; align-self: flex-end;
+}
+.ai-submit-btn:hover { background: var(--acc2); }
+
+/* Loading indicator */
+#ai-loading {
+  display: none; align-items: center; gap: 8px;
+  font-size: 0.75rem; color: var(--mut);
+}
+
+/* Solution area */
+#ai-solution-area {
+  display: none; flex-direction: column; gap: 10px;
+}
+.ai-verdict {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 100px; font-size: 0.78rem; font-weight: 700;
+}
+.ai-verdict.correct   { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+.ai-verdict.incorrect { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+#ai-feedback { font-size: 0.78rem; color: #ccc; line-height: 1.55; }
+
+.ai-sol-card { background: var(--bg2); border: 1px solid var(--bdr); border-radius: 10px; padding: 0.9rem; }
+.ai-sol-label { font-size: 0.62rem; color: var(--grn); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 6px; }
+#ai-solution-text { font-size: 0.78rem; line-height: 1.7; color: #ccc; white-space: pre-wrap; }
+
+.ai-kp-card { background: var(--bg3); border: 1px solid var(--bdr); border-radius: 8px; padding: 0.75rem; }
+.ai-kp-label { font-size: 0.62rem; color: var(--acc2); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 6px; }
+#ai-key-points { font-size: 0.75rem; color: #ccc; line-height: 1.65; padding-left: 1rem; }
+#ai-key-points li { margin-bottom: 3px; }
+
+.ai-pro-tip {
+  background: rgba(124,111,255,0.07); border-left: 3px solid var(--acc);
+  border-radius: 0 7px 7px 0; padding: 0.6rem 0.8rem;
+  font-size: 0.75rem; color: #ccc; line-height: 1.55;
+}
+.ai-pro-tip-label { font-size: 0.6rem; color: var(--acc2); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+
+.ai-next-btn {
+  background: var(--bg2); border: 1px solid var(--acc);
+  color: var(--acc2); font-family: var(--sans); font-size: 0.78rem; font-weight: 600;
+  padding: 8px 20px; border-radius: 8px; cursor: pointer;
+  transition: all 0.15s; align-self: flex-start;
+}
+.ai-next-btn:hover { background: rgba(124,111,255,0.15); }

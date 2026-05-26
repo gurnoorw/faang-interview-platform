@@ -1,0 +1,181 @@
+/**
+ * home.css — Home screen: mode selector, round tabs, problem grid
+ */
+
+/* ── Home screen layout ─────────────────────────────────────────────── */
+#home {
+  overflow-y: auto;
+  background: radial-gradient(ellipse at 18% 20%, rgba(124,111,255,0.09) 0%, transparent 55%), var(--bg);
+}
+.home-inner {
+  padding: 1.5rem 2rem;
+  display: flex; flex-direction: column; gap: 1.25rem;
+  max-width: 940px; margin: 0 auto; width: 100%;
+}
+.home-tag {
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--acc2);
+  background: rgba(124,111,255,0.1); border: 1px solid rgba(124,111,255,0.2);
+  padding: 4px 12px; border-radius: 100px; display: inline-block;
+  margin-bottom: 0.5rem;
+}
+.home-h1 {
+  font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #fff 20%, var(--acc2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+/* ── Mode toggle ────────────────────────────────────────────────────── */
+.mode-toggle {
+  display: flex; gap: 6px;
+  background: var(--bg2); border: 1px solid var(--bdr);
+  padding: 4px; border-radius: 10px; width: fit-content;
+}
+.mode-btn {
+  padding: 7px 18px; border-radius: 7px;
+  border: none; background: none;
+  font-family: var(--sans); font-size: 0.78rem; font-weight: 600;
+  color: var(--mut); cursor: pointer; transition: all 0.15s;
+}
+.mode-btn.active {
+  background: var(--acc); color: white;
+}
+
+/* ── Interviewee section ─────────────────────────────────────────────── */
+#interviewee-home { display: flex; flex-direction: column; gap: 1rem; }
+#interviewer-home { display: none; flex-direction: column; gap: 1rem; }
+
+/* ── Round tabs ─────────────────────────────────────────────────────── */
+.round-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.rtab {
+  padding: 6px 14px; border-radius: 8px;
+  border: 1px solid var(--bdr); background: none;
+  color: var(--mut); font-size: 0.78rem; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; font-family: var(--sans);
+}
+.rtab:hover { border-color: var(--acc); color: var(--acc2); }
+.rtab.active {
+  background: rgba(124,111,255,0.15);
+  border-color: var(--acc); color: var(--acc2);
+}
+
+/* ── Problem picker grid ────────────────────────────────────────────── */
+.prob-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  gap: 10px; width: 100%;
+}
+.prob-card {
+  background: var(--bg2); border: 1px solid var(--bdr);
+  border-radius: 12px; padding: 0.9rem;
+  cursor: pointer; transition: all 0.18s; position: relative;
+}
+.prob-card:hover { border-color: var(--acc); transform: translateY(-1px); background: var(--bg3); }
+.prob-card.selected { border-color: var(--acc); background: rgba(124,111,255,0.1); }
+.pc-tag {
+  font-size: 9px; font-weight: 700;
+  padding: 2px 7px; border-radius: 100px;
+  display: inline-block; margin-bottom: 6px;
+}
+.tag-e { background: rgba(34,197,94,0.12);  color: #4ade80; border: 1px solid rgba(34,197,94,0.2);  }
+.tag-m { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+.tag-h { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.2);  }
+.pc-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 3px; }
+.pc-sub   { font-size: 0.7rem; color: var(--mut); line-height: 1.4; }
+.pc-check {
+  position: absolute; top: 10px; right: 10px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--acc); display: none;
+  align-items: center; justify-content: center; font-size: 10px;
+}
+.prob-card.selected .pc-check { display: flex; }
+
+/* ── Start button ────────────────────────────────────────────────────── */
+.start-btn {
+  background: var(--acc); border: none; color: white;
+  font-family: var(--sans); font-size: 0.88rem; font-weight: 600;
+  padding: 10px 28px; border-radius: 10px; cursor: pointer; transition: all 0.15s;
+}
+.start-btn:hover { background: var(--acc2); }
+.start-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Interviewer mode panel ──────────────────────────────────────────── */
+.iv-tab-row { display: flex; gap: 4px; flex-wrap: wrap; }
+.iv-tab {
+  padding: 5px 12px; border-radius: 7px;
+  border: 1px solid var(--bdr); background: none;
+  color: var(--mut); font-size: 0.72rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; font-family: var(--sans);
+}
+.iv-tab:hover { border-color: var(--acc); color: var(--acc2); }
+.iv-tab.active { background: rgba(124,111,255,0.15); border-color: var(--acc); color: var(--acc2); }
+
+.iv-panel {
+  display: none; flex-direction: column; gap: 0.8rem;
+  background: var(--bg2); border: 1px solid var(--bdr);
+  border-radius: 12px; padding: 1rem;
+}
+
+/* Question list cards */
+.iv-q-card {
+  background: var(--bg3); border: 1px solid var(--bdr);
+  border-radius: 8px; padding: 0.65rem 0.75rem;
+}
+.iv-q-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.iv-q-title { font-size: 0.78rem; font-weight: 600; }
+.iv-q-meta  { font-size: 0.66rem; color: var(--mut); margin-top: 3px; }
+.iv-q-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.iv-q-btn {
+  width: 24px; height: 24px; border-radius: 6px;
+  border: 1px solid var(--bdr); background: none;
+  color: var(--mut); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; transition: all 0.15s;
+}
+.iv-q-btn:hover { border-color: var(--acc); color: var(--acc2); }
+.iv-q-btn.danger:hover { border-color: var(--red); color: var(--red); }
+
+/* Add form */
+.add-form {
+  background: var(--bg3); border: 1px solid var(--bdr);
+  border-radius: 10px; padding: 0.9rem;
+  display: flex; flex-direction: column; gap: 0.65rem;
+}
+.add-form-title {
+  font-size: 0.7rem; font-weight: 700; color: var(--acc2);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.form-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.form-field { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 140px; }
+.form-field label { font-size: 0.63rem; color: var(--mut); text-transform: uppercase; letter-spacing: 0.5px; }
+.form-field input, .form-field textarea, .form-field select {
+  background: var(--bg2); border: 1px solid var(--bdr);
+  border-radius: 6px; color: var(--txt);
+  font-family: var(--sans); font-size: 0.76rem;
+  padding: 6px 9px; outline: none; transition: border-color 0.15s;
+  resize: vertical;
+}
+.form-field input:focus, .form-field textarea:focus, .form-field select:focus {
+  border-color: var(--acc);
+}
+.form-field input::placeholder, .form-field textarea::placeholder { color: var(--mut); }
+.add-btn {
+  background: rgba(124,111,255,0.15);
+  border: 1px solid rgba(124,111,255,0.3);
+  color: var(--acc2); font-family: var(--sans);
+  font-size: 0.75rem; font-weight: 600;
+  padding: 7px 16px; border-radius: 7px;
+  cursor: pointer; transition: all 0.15s; align-self: flex-start;
+}
+.add-btn:hover { background: rgba(124,111,255,0.25); }
+
+/* LeetCode import helper */
+.lc-import-hint {
+  font-size: 0.67rem; color: var(--mut);
+  background: rgba(124,111,255,0.05);
+  border: 1px solid rgba(124,111,255,0.12);
+  border-radius: 6px; padding: 6px 9px; line-height: 1.5;
+}

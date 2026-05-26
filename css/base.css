@@ -1,0 +1,163 @@
+/**
+ * base.css — Design tokens, resets, shared atoms
+ * All other CSS files import variables defined here.
+ */
+
+/* ── Google Fonts ───────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+/* ── CSS variables ──────────────────────────────────────────────────── */
+:root {
+  /* Background layers */
+  --bg:   #0d0d12;
+  --bg2:  #13131e;
+  --bg3:  #1a1a28;
+  --bg4:  #252540;
+
+  /* Accent */
+  --acc:  #7c6fff;
+  --acc2: #a78bfa;
+
+  /* Semantic */
+  --grn: #22c55e;
+  --red: #ef4444;
+  --amb: #f59e0b;
+  --blu: #3b82f6;
+
+  /* Text */
+  --txt: #eeeeff;
+  --mut: #6868a0;
+
+  /* Borders */
+  --bdr: rgba(124,111,255,0.18);
+
+  /* Fonts */
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ── Reset ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--txt);
+  font-family: var(--sans);
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Screen base ────────────────────────────────────────────────────── */
+.screen { display: none; height: 100vh; flex-direction: column; overflow: hidden; }
+.screen.active { display: flex; }
+
+/* ── Scrollbar ──────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+/* ── Loading overlay (inside room) ─────────────────────────────────── */
+.lov {
+  position: absolute; inset: 0;
+  background: rgba(13,13,18,0.88);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50; flex-direction: column; gap: 0.75rem;
+}
+.lov.hid { display: none; }
+.sp {
+  width: 30px; height: 30px;
+  border: 2px solid var(--bdr);
+  border-top-color: var(--acc);
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.lt { color: var(--mut); font-size: 0.77rem; }
+
+/* ── Toast notification ─────────────────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+  background: var(--acc); color: white;
+  font-size: 0.78rem; font-weight: 600;
+  padding: 8px 18px; border-radius: 100px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 200;
+}
+#toast.visible { opacity: 1; }
+
+/* ── Edit modal ─────────────────────────────────────────────────────── */
+#edit-modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  align-items: center; justify-content: center;
+  z-index: 100;
+}
+.edit-modal-inner {
+  background: var(--bg2); border: 1px solid var(--bdr);
+  border-radius: 14px; padding: 1.5rem;
+  width: min(560px, 90vw);
+  max-height: 80vh; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.edit-modal-title {
+  font-size: 0.9rem; font-weight: 700; margin-bottom: 0.25rem;
+}
+.edit-field {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.edit-field label {
+  font-size: 0.68rem; color: var(--mut);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.edit-field input, .edit-field textarea, .edit-field select {
+  background: var(--bg3); border: 1px solid var(--bdr);
+  border-radius: 7px; color: var(--txt);
+  font-family: var(--sans); font-size: 0.78rem;
+  padding: 7px 10px; outline: none;
+  transition: border-color 0.15s;
+  resize: vertical;
+}
+.edit-field input:focus, .edit-field textarea:focus, .edit-field select:focus {
+  border-color: var(--acc);
+}
+.edit-modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+.em-btn {
+  padding: 7px 16px; border-radius: 7px;
+  font-family: var(--sans); font-size: 0.75rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.em-save { background: var(--acc); border: none; color: white; }
+.em-save:hover { background: var(--acc2); }
+.em-cancel { background: none; border: 1px solid var(--bdr); color: var(--txt); }
+.em-cancel:hover { border-color: var(--acc); color: var(--acc2); }
+
+/* ── Shared tag/badge atoms ─────────────────────────────────────────── */
+.rbadge {
+  background: rgba(124,111,255,0.12);
+  border: 1px solid rgba(124,111,255,0.2);
+  color: var(--acc2);
+  font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 100px; font-weight: 700;
+}
+.dbadge {
+  font-size: 0.68rem; font-weight: 600;
+  padding: 2px 8px; border-radius: 100px;
+  display: inline-flex; align-items: center;
+}
+.dm { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+.dh { background: rgba(239,68,68,0.1);  color: #f87171; border: 1px solid rgba(239,68,68,0.2);  }
+.de { background: rgba(34,197,94,0.1);  color: #4ade80; border: 1px solid rgba(34,197,94,0.2);  }
+
+/* ── LeetCode link ──────────────────────────────────────────────────── */
+.lc-link {
+  font-size: 0.68rem; color: var(--acc2);
+  text-decoration: none; border-bottom: 1px dashed var(--acc);
+  padding-bottom: 1px; transition: opacity 0.15s;
+}
+.lc-link:hover { opacity: 0.7; }
+
+/* ── Shared animations ──────────────────────────────────────────────── */
+@keyframes bl   { from{opacity:1} to{opacity:.2} }
+@keyframes pu   { 0%,100%{opacity:1} 50%{opacity:.3} }
+@keyframes msgIn{ from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:none} }
