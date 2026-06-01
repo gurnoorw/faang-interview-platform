@@ -8,7 +8,7 @@
 const CONFIG = {
   /* ── Anthropic API ─────────────────────────────────────────────────── */
   API_URL:   'https://api.anthropic.com/v1/messages',
-  API_MODEL: 'claude-sonnet-4-20250514',
+  API_MODEL: 'claude-sonnet-4-6',
   API_MAX_TOKENS: 900,              // default response budget
 
   /* ── Rate limiting ──────────────────────────────────────────────────── */
