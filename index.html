@@ -292,6 +292,12 @@
       <!-- Chat messages -->
       <div class="chat-zone" id="chat" aria-live="polite" aria-label="Chat with interviewer"></div>
 
+      <!-- Live voice transcription (shown when mic is on) -->
+      <div class="voice-transcript" id="voice-transcript" aria-live="polite">
+        <div class="vt-header"><span class="vt-dot"></span>Hearing you</div>
+        <div id="vt-text" class="vt-text">...</div>
+      </div>
+
       <!-- Message input -->
       <div class="inp-row">
         <input class="cinp" id="cinp"
@@ -458,48 +464,36 @@
       </div><!-- /pbody -->
     </div><!-- /ctr-col -->
 
-    <!-- ── RIGHT: Live Eval ── -->
+    <!-- ── RIGHT: Performance Tracker (scores locked until end) ── -->
     <div class="ev-col">
-      <div class="evh"><span class="ldot" aria-hidden="true"></span>Live tracking</div>
+      <div class="evh"><span class="ldot" aria-hidden="true"></span>Session tracker</div>
       <div class="evb">
 
-        <div class="evm">
-          <div class="eml">Problem solving</div>
-          <div class="ems sm" id="sc-ps">—</div>
-          <div class="embar"><div class="emf fm" id="fl-ps" style="width:0%"></div></div>
-          <div class="emn" id="nt-ps">Watching...</div>
+        <!-- Hidden score elements — still updated by JS, revealed in feedback screen -->
+        <div style="display:none">
+          <div id="sc-ps"></div><div id="fl-ps"></div><div id="nt-ps"></div>
+          <div id="sc-cm"></div><div id="fl-cm"></div><div id="nt-cm"></div>
+          <div id="sc-cq"></div><div id="fl-cq"></div><div id="nt-cq"></div>
+          <div id="sc-tm"></div><div id="fl-tm"></div><div id="nt-tm"></div>
         </div>
 
-        <div class="evm">
-          <div class="eml">Communication</div>
-          <div class="ems sm" id="sc-cm">—</div>
-          <div class="embar"><div class="emf fm" id="fl-cm" style="width:0%"></div></div>
-          <div class="emn" id="nt-cm">Start explaining</div>
+        <!-- Locked banner -->
+        <div class="ev-locked-banner">
+          <div class="ev-locked-icon">🔒</div>
+          <div class="ev-locked-title">Results locked</div>
+          <div class="ev-locked-sub">Detailed scores &amp; rubric analysis revealed after<br><strong>End &amp; Evaluate</strong></div>
         </div>
 
-        <div class="evm">
-          <div class="eml">Code / Design quality</div>
-          <div class="ems sm" id="sc-cq">—</div>
-          <div class="embar"><div class="emf fm" id="fl-cq" style="width:0%"></div></div>
-          <div class="emn" id="nt-cq">Write code to evaluate</div>
-        </div>
-
-        <div class="evm">
-          <div class="eml">Time management</div>
-          <div class="ems sg" id="sc-tm">Good</div>
-          <div class="embar"><div class="emf fg" id="fl-tm" style="width:78%"></div></div>
-          <div class="emn" id="nt-tm">On track</div>
-        </div>
-
+        <!-- Pressure meter (useful live signal, not a score) -->
         <div class="pz">
           <div class="pzl">Interview pressure</div>
           <div class="pzbar"><div class="pzf pz-lo" id="pzf" style="width:18%"></div></div>
           <div class="pzlbl pz-lo" id="pzlbl">Low — warming up</div>
         </div>
 
-        <!-- Speech waveform -->
+        <!-- Voice waveform -->
         <div class="evm" style="padding:0.45rem">
-          <div class="eml" style="margin-bottom:5px">Speech</div>
+          <div class="eml" style="margin-bottom:5px">Voice activity</div>
           <div class="wvfrm" id="wvfrm" aria-hidden="true">
             <div class="wb3"></div><div class="wb3"></div><div class="wb3"></div>
             <div class="wb3"></div><div class="wb3"></div><div class="wb3"></div>
@@ -509,6 +503,33 @@
           <div class="spst">
             <div class="ss"><div class="ssn" id="wpm">—</div><div class="ssl">WPM</div></div>
             <div class="ss"><div class="ssn" id="fill">—</div><div class="ssl">Fillers</div></div>
+          </div>
+        </div>
+
+        <!-- Live communication log (counts, not scores) -->
+        <div class="evm">
+          <div class="eml" style="margin-bottom:6px">Communication log</div>
+          <div class="ev-session-log">
+            <div class="ev-log-row">
+              <span>💬 Words spoken</span>
+              <span class="ev-log-val" id="evl-words">0</span>
+            </div>
+            <div class="ev-log-row">
+              <span>📨 Messages sent</span>
+              <span class="ev-log-val" id="evl-msgs">0</span>
+            </div>
+            <div class="ev-log-row">
+              <span>❓ Clarifying Qs</span>
+              <span class="ev-log-val" id="evl-clarit">0</span>
+            </div>
+            <div class="ev-log-row">
+              <span>🗣️ Filler words</span>
+              <span class="ev-log-val ev-log-filler" id="evl-fillers">0</span>
+            </div>
+            <div class="ev-log-row">
+              <span>🔇 Silence nudges</span>
+              <span class="ev-log-val" id="evl-silence">0</span>
+            </div>
           </div>
         </div>
 

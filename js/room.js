@@ -45,6 +45,9 @@ const ROOM = (() => {
     _ivBusy      = false;
     _lastActTime = Date.now();
 
+    // Reset communication tracker for fresh session
+    if (typeof COMM_TRACKER !== 'undefined') COMM_TRACKER.reset();
+
     // Interviewer persona per round
     const personas = {
       DSA: { name: 'Priya Sharma',   role: 'Senior SDE-3 · Amazon',        emoji: '👩‍💻' },
@@ -154,6 +157,9 @@ const ROOM = (() => {
     addMsg(text, 'me', 'You');
     _wordCount += text.split(/\s+/).length;
     _updateSpeechStats();
+
+    // Log to communication tracker
+    if (typeof COMM_TRACKER !== 'undefined') COMM_TRACKER.addMessage(text);
 
     _history.push({ role: 'user', content: text });
     if (_history.length > CONFIG.HISTORY_CAP) _history = _history.slice(-CONFIG.HISTORY_CAP);
@@ -274,6 +280,7 @@ const ROOM = (() => {
       const msg = nudges[Math.floor(Math.random() * nudges.length)];
       _triggerInterrupt(msg, 'prob');
       _lastActTime = Date.now();   // reset so we don't spam
+      if (typeof COMM_TRACKER !== 'undefined') COMM_TRACKER.addSilenceNudge();
     }
   }
 
@@ -404,14 +411,19 @@ const ROOM = (() => {
 
     APP.showRoomLoading('Generating your detailed feedback...');
 
+    const commNotes = typeof COMM_TRACKER !== 'undefined'
+      ? COMM_TRACKER.getSummary()
+      : '';
+
     const fb = await generateFeedback({
-      round: _round,
-      problem: _problem,
-      history: _history,
+      round:       _round,
+      problem:     _problem,
+      history:     _history,
       code,
       timeUsedSec,
       msgCount:    _msgCount,
       submitCount: _submitCount,
+      commNotes,
     });
 
     APP.hideRoomLoading();
