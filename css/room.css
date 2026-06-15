@@ -314,3 +314,57 @@
 .ss { flex: 1; background: var(--bg4); border-radius: 4px; padding: 3px; text-align: center; }
 .ssn { font-size: 0.74rem; font-weight: 600; }
 .ssl { font-size: 0.56rem; color: var(--mut); }
+
+/* ── Locked eval panel ───────────────────────────────────────────────── */
+.ev-locked-banner {
+  background: var(--bg3); border: 1px solid var(--bdr); border-radius: 9px;
+  padding: 0.9rem 0.75rem; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.ev-locked-icon { font-size: 1.5rem; }
+.ev-locked-title {
+  font-size: 0.74rem; font-weight: 700; color: var(--acc2);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.ev-locked-sub { font-size: 0.64rem; color: var(--mut); line-height: 1.55; }
+
+/* ── Session log (replaces hidden score bars) ───────────────────────── */
+.ev-session-log { display: flex; flex-direction: column; gap: 4px; }
+.ev-log-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.68rem; color: var(--mut); padding: 2px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.ev-log-val { color: var(--acc2); font-weight: 600; font-size: 0.72rem; min-width: 28px; text-align: right; }
+.ev-log-filler { color: var(--amb) !important; }
+
+/* ── Live transcription overlay (above input bar) ───────────────────── */
+.voice-transcript {
+  margin: 0; padding: 0.45rem 0.6rem;
+  background: rgba(34,197,94,0.06); border-top: 1px solid rgba(34,197,94,0.15);
+  display: none; flex-direction: column; gap: 2px; flex-shrink: 0;
+  animation: fadeIn 0.2s ease;
+}
+.voice-transcript.active { display: flex; }
+.vt-header {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 0.58rem; color: var(--grn); text-transform: uppercase;
+  letter-spacing: 0.5px; font-weight: 700;
+}
+.vt-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--grn); animation: bl 0.5s infinite alternate; flex-shrink: 0; }
+.vt-text {
+  font-size: 0.76rem; color: #d4f7d4; line-height: 1.45;
+  font-style: italic; min-height: 16px;
+}
+.vt-interim { color: rgba(212,247,212,0.55); }
+
+/* ── Filler pill (shown in transcript as it's detected) ─────────────── */
+.filler-alert {
+  position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
+  background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+  color: #fde68a; font-size: 0.7rem; font-weight: 600;
+  padding: 5px 14px; border-radius: 100px;
+  animation: fadeIn 0.2s ease, fadeOut 0.3s ease 1.5s forwards;
+  pointer-events: none; z-index: 500;
+}
+@keyframes fadeOut { to { opacity: 0; transform: translateX(-50%) translateY(-6px); } }
