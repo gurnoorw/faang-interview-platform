@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="css/room.css"/>
   <link rel="stylesheet" href="css/feedback.css"/>
   <link rel="stylesheet" href="css/airound.css"/>
+  <link rel="stylesheet" href="css/progress.css"/>
 </head>
 <body>
 
@@ -31,15 +32,27 @@
         <div class="home-tag">SDE-3 · FAANG Prep · Bangalore</div>
         <div class="home-h1">Mock Interview Platform</div>
       </div>
-      <button onclick="showApiKeyModal()"
-              title="Update API key"
-              style="background:transparent;border:1px solid var(--brd);border-radius:8px;
-                     padding:0.45rem 0.65rem;cursor:pointer;color:var(--mut);font-size:0.8rem;
-                     display:flex;align-items:center;gap:5px;transition:color .15s,border-color .15s"
-              onmouseover="this.style.color='var(--fg)';this.style.borderColor='var(--acc2)'"
-              onmouseout="this.style.color='var(--mut)';this.style.borderColor='var(--brd)'">
-        <i class="ti ti-key" style="font-size:13px"></i> API Key
-      </button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="goProgress()"
+                title="View performance dashboard"
+                style="background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);
+                       border-radius:8px;padding:0.45rem 0.75rem;cursor:pointer;color:var(--acc2);
+                       font-size:0.78rem;display:flex;align-items:center;gap:5px;
+                       transition:background .15s,border-color .15s;font-family:var(--sans)"
+                onmouseover="this.style.background='rgba(124,111,255,0.22)'"
+                onmouseout="this.style.background='rgba(124,111,255,0.12)'">
+          📊 Progress
+        </button>
+        <button onclick="showApiKeyModal()"
+                title="Update API key"
+                style="background:transparent;border:1px solid var(--brd);border-radius:8px;
+                       padding:0.45rem 0.65rem;cursor:pointer;color:var(--mut);font-size:0.8rem;
+                       display:flex;align-items:center;gap:5px;transition:color .15s,border-color .15s"
+                onmouseover="this.style.color='var(--fg)';this.style.borderColor='var(--acc2)'"
+                onmouseout="this.style.color='var(--mut)';this.style.borderColor='var(--brd)'">
+          <i class="ti ti-key" style="font-size:13px"></i> API Key
+        </button>
+      </div>
     </div>
 
     <!-- Mode toggle -->
@@ -570,8 +583,54 @@
     <button class="fba fba-p" onclick="retryRound()">Retry this problem</button>
     <button class="fba fba-g" onclick="goHome()">Pick another problem</button>
     <button class="fba fba-g" onclick="exportFeedbackReport()">Export report</button>
+    <button class="fba fba-g" onclick="goProgress()" style="background:rgba(124,111,255,0.15);border-color:rgba(124,111,255,0.3);color:var(--acc2)">📊 Progress dashboard</button>
   </div>
 </div><!-- /feedback -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PROGRESS / PERFORMANCE DASHBOARD SCREEN
+══════════════════════════════════════════════════════════════════════ -->
+<div id="progress" class="screen">
+  <div class="prog-inner">
+
+    <!-- Header -->
+    <div class="prog-header">
+      <button class="bk" onclick="goHome()" title="Back to home"
+              style="background:none;border:1px solid var(--brd);border-radius:8px;
+                     padding:6px 12px;color:var(--mut);cursor:pointer;font-size:0.78rem;
+                     font-family:var(--sans);transition:color .15s,border-color .15s"
+              onmouseover="this.style.color='var(--fg)';this.style.borderColor='var(--acc)'"
+              onmouseout="this.style.color='var(--mut)';this.style.borderColor='var(--brd)'">
+        ← Home
+      </button>
+      <div style="flex:1">
+        <div class="prog-title">📊 Performance Dashboard</div>
+        <div class="prog-sub" id="prog-session-count">Loading…</div>
+      </div>
+      <button onclick="clearHistory()" class="prog-clear-btn" title="Delete all recorded sessions">
+        🗑 Clear history
+      </button>
+    </div>
+
+    <!-- Stats bar (rendered by progress.js) -->
+    <div class="prog-stats-bar" id="prog-stats-bar"></div>
+
+    <!-- Round filter tabs -->
+    <div class="prog-tab-row">
+      <button class="ptab active" data-round="all"  onclick="progTab('all',this)">Overview</button>
+      <button class="ptab"        data-round="DSA"  onclick="progTab('DSA',this)">⚡ DSA</button>
+      <button class="ptab"        data-round="HLD"  onclick="progTab('HLD',this)">🏗️ HLD</button>
+      <button class="ptab"        data-round="LLD"  onclick="progTab('LLD',this)">🔧 LLD</button>
+      <button class="ptab"        data-round="BEH"  onclick="progTab('BEH',this)">💬 BEH</button>
+      <button class="ptab"        data-round="AI"   onclick="progTab('AI',this)">🤖 AI</button>
+    </div>
+
+    <!-- Dynamic content rendered by progress.js -->
+    <div id="prog-content"></div>
+
+  </div>
+</div>
 
 
 <!-- ════════════════════════════════════════════════════════════════════
@@ -655,6 +714,8 @@
 <script src="js/feedback.js"></script>
 <script src="js/interviewer.js"></script>
 <script src="js/room.js"></script>
+<script src="js/history.js"></script>
+<script src="js/progress.js"></script>
 <script src="js/app.js"></script>
 
 <!-- Inline glue: small helpers that don't warrant their own file -->

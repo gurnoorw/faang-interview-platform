@@ -274,7 +274,7 @@ function _fallbackFeedback(round, problem) {
    RENDER FEEDBACK REPORT
 ═══════════════════════════════════════════════════════════════════════ */
 
-function renderFeedback(fb, problem, round) {
+function renderFeedback(fb, problem, round, prevSessions) {
   /* ── Score ring ────────────────────────────────────────────────────── */
   const score = fb.overall || 60;
   document.getElementById('fb-n').textContent = score;
@@ -366,6 +366,11 @@ function renderFeedback(fb, problem, round) {
       ol.appendChild(d);
     });
     body.appendChild(_makeSection('ti-list-check', 'Action Plan — Next 2 Weeks', ol));
+  }
+
+  /* ── 7. History comparison (requires prevSessions from room.js) ──────── */
+  if (prevSessions?.length > 0 && typeof renderHistoryComparison === 'function') {
+    renderHistoryComparison(fb, round, prevSessions);
   }
 }
 

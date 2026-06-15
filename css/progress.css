@@ -1,0 +1,324 @@
+/* ════════════════════════════════════════════════════════════════════════
+   progress.css — Performance Dashboard screen
+   Depends on CSS variables defined in base.css:
+     --bg, --bg2, --bg3, --bg4, --bdr, --acc, --acc2
+     --txt, --mut, --grn, --amb, --red, --blu
+════════════════════════════════════════════════════════════════════════ */
+
+/* ── Screen container ─────────────────────────────────────────────────── */
+
+#progress {
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+#progress.active {
+  display: flex;
+}
+
+.prog-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 1.5rem 2rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────── */
+
+.prog-header {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.prog-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--txt);
+  flex: 1;
+}
+
+.prog-sub {
+  font-size: 0.68rem;
+  color: var(--mut);
+  margin-top: 1px;
+}
+
+.prog-clear-btn {
+  background: none;
+  border: 1px solid var(--bdr);
+  color: var(--mut);
+  border-radius: 7px;
+  padding: 5px 12px;
+  font-size: 0.68rem;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.prog-clear-btn:hover {
+  color: var(--red);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* ── Stats bar (4-column grid) ────────────────────────────────────────── */
+
+.prog-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.65rem;
+}
+
+.prog-stat {
+  background: var(--bg2);
+  border: 1px solid var(--bdr);
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+}
+
+.prog-stat-n {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--acc2);
+  line-height: 1.1;
+}
+
+.prog-stat-l {
+  font-size: 0.62rem;
+  color: var(--mut);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 3px;
+}
+
+/* ── Round filter tabs ────────────────────────────────────────────────── */
+
+.prog-tab-row {
+  display: flex;
+  gap: 3px;
+  background: var(--bg2);
+  border: 1px solid var(--bdr);
+  border-radius: 9px;
+  padding: 3px;
+}
+
+.ptab {
+  flex: 1;
+  padding: 6px 4px;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  color: var(--mut);
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--sans);
+}
+
+.ptab.active {
+  background: var(--acc);
+  color: #fff;
+}
+
+.ptab:hover:not(.active) {
+  color: var(--txt);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ── Content area ─────────────────────────────────────────────────────── */
+
+#prog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+/* ── Section card ─────────────────────────────────────────────────────── */
+
+.prog-section {
+  background: var(--bg2);
+  border: 1px solid var(--bdr);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.prog-sec-hdr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--bdr);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--txt);
+}
+
+.prog-sec-body {
+  padding: 0.875rem 1rem;
+}
+
+/* ── Category comparison rows ─────────────────────────────────────────── */
+
+.cat-comp-row {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.cat-comp-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* ── Improvement badges ───────────────────────────────────────────────── */
+
+.impr-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 0.63rem;
+  font-weight: 700;
+}
+
+.impr-up {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--grn);
+}
+
+.impr-down {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--red);
+}
+
+.impr-flat {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--mut);
+}
+
+/* ── Universal skills 2-column grid ──────────────────────────────────── */
+
+.univ-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+.univ-card {
+  background: var(--bg3);
+  border: 1px solid var(--bdr);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.univ-card-title {
+  font-size: 0.6rem;
+  color: var(--mut);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+
+.univ-card-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.univ-card-trend {
+  font-size: 0.63rem;
+  margin-top: 3px;
+}
+
+/* ── Session history table ────────────────────────────────────────────── */
+
+.sess-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+
+.sess-table th {
+  font-size: 0.6rem;
+  color: var(--mut);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--bdr);
+  white-space: nowrap;
+}
+
+.sess-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--txt);
+}
+
+.sess-table tr:last-child td {
+  border-bottom: none;
+}
+
+.sess-table tbody tr:hover td {
+  background: rgba(124, 111, 255, 0.04);
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────── */
+
+.prog-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--mut);
+}
+
+.prog-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.prog-empty-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--txt);
+  margin-bottom: 0.4rem;
+}
+
+.prog-empty-sub {
+  font-size: 0.72rem;
+  line-height: 1.7;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .prog-inner {
+    padding: 1rem;
+  }
+
+  .prog-stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .univ-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prog-tab-row {
+    flex-wrap: wrap;
+  }
+
+  .ptab {
+    flex: 1 1 calc(33% - 6px);
+  }
+
+  .sess-table th:last-child,
+  .sess-table td:last-child {
+    display: none; /* hide SDE-3 bar column on small screens */
+  }
+}

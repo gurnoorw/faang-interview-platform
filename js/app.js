@@ -178,6 +178,19 @@ async function launchInterview() {
   }
 }
 
+/* ── Progress dashboard ──────────────────────────────────────────────── */
+
+function goProgress() {
+  _progTab = 'all';
+  // Reset tab UI before showing screen
+  APP.showScreen('progress');
+  // Activate the Overview tab button
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+  const overviewBtn = document.querySelector('.ptab[data-round="all"]');
+  if (overviewBtn) overviewBtn.classList.add('active');
+  if (typeof renderProgress === 'function') renderProgress();
+}
+
 /* ── Go home ─────────────────────────────────────────────────────────── */
 
 function goHome() {

@@ -426,8 +426,46 @@ const ROOM = (() => {
       commNotes,
     });
 
+    // Snapshot previous sessions BEFORE saving current one so the
+    // comparison in the feedback report is truly "vs your history"
+    const prevSessions = typeof HISTORY !== 'undefined'
+      ? HISTORY.getByRound(_round)
+      : [];
+
+    // Persist session to localStorage
+    if (typeof HISTORY !== 'undefined') {
+      const rawComm = typeof COMM_TRACKER !== 'undefined' ? COMM_TRACKER.getData() : {};
+      HISTORY.add({
+        ts:         Date.now(),
+        round:      _round,
+        problem: {
+          id:         _problem.id         || '',
+          title:      _problem.title      || '',
+          difficulty: _problem.difficulty || 'medium',
+        },
+        durationMin:  Math.round(timeUsedSec / 60),
+        msgCount:     _msgCount,
+        submitCount:  _submitCount,
+        overall:      fb.overall  || 0,
+        verdict:      fb.verdict  || '',
+        sde3Level:    fb.sde3Assessment?.currentLevel || '',
+        categories:   (fb.categories || []).map(c => ({ name: c.name, score: c.score })),
+        commStats: {
+          totalWords:       rawComm.totalWords       || 0,
+          voiceWords:       rawComm.voiceWords       || 0,
+          typedWords:       rawComm.typedWords       || 0,
+          fillerTotal:      rawComm.fillerTotal      || 0,
+          fillerByType:     rawComm.fillerByType     || {},
+          clarifyingQs:     rawComm.clarifyingQs     || 0,
+          silenceNudges:    rawComm.silenceNudges    || 0,
+          thinkAloudBursts: rawComm.thinkAloudBursts || 0,
+          speakingMs:       rawComm.speakingMs       || 0,
+        },
+      });
+    }
+
     APP.hideRoomLoading();
-    renderFeedback(fb, _problem, _round);
+    renderFeedback(fb, _problem, _round, prevSessions);
     APP.showScreen('feedback');
   }
 
