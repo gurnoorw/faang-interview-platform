@@ -360,7 +360,8 @@
               <option value="cpp">C++</option>
               <option value="javascript">JavaScript</option>
             </select>
-            <button class="rbtn" onclick="runCodeSimulate()">▶ Run</button>
+            <button class="rbtn" id="run-btn" onclick="runCode()">▶ Run</button>
+            <button class="rbtn" id="test-btn" onclick="runTests()" style="display:none;background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.3);color:#22c55e" title="Run against problem test cases">▶ Tests</button>
             <button class="sbtn" onclick="ROOM.submitCode()">Submit ↗</button>
           </div>
           <div class="edwrap">
@@ -388,8 +389,16 @@
               <span class="od" style="background:#f59e0b" aria-hidden="true"></span>
               <span class="od" style="background:#22c55e" aria-hidden="true"></span>
               <span style="margin-left:5px">Console</span>
+              <span id="out-meta" style="margin-left:auto;font-size:0.6rem;color:var(--mut)"></span>
             </div>
-            <div id="otxt">Run your code to see output...</div>
+            <!-- stdout -->
+            <div id="otxt">Run your code to see output…</div>
+            <!-- stderr / compile errors — hidden when empty -->
+            <div id="otxt-err" style="display:none;color:#ef4444;font-size:0.7rem;
+                 padding:4px 10px;border-top:1px solid rgba(239,68,68,0.2);
+                 white-space:pre-wrap;font-family:monospace"></div>
+            <!-- test case results — hidden when not in test mode -->
+            <div id="otxt-tests" style="display:none"></div>
           </div>
         </div>
 
@@ -713,6 +722,7 @@
 <script src="js/airound.js"></script>
 <script src="js/feedback.js"></script>
 <script src="js/interviewer.js"></script>
+<script src="js/executor.js"></script>
 <script src="js/room.js"></script>
 <script src="js/history.js"></script>
 <script src="js/progress.js"></script>
@@ -753,26 +763,175 @@ function saveApiKey() {
   if (t) { t.textContent = '✓ API key saved'; t.className = 'show'; setTimeout(() => t.className = '', 2500); }
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+   CODE EXECUTION — powered by Piston (https://github.com/engineer-man/piston)
+   Free, open-source, no API key. Public endpoint: emkc.org/api/v2/piston
+════════════════════════════════════════════════════════════════════════ */
+
+/** Show/hide the "▶ Tests" button based on whether the current problem has test cases. */
+function _syncTestBtn() {
+  const prob = typeof ROOM !== 'undefined' ? ROOM.problem : null;
+  const btn  = document.getElementById('test-btn');
+  if (!btn) return;
+  const hasTests = prob && Array.isArray(prob.testCases) && prob.testCases.length > 0;
+  const round    = typeof ROOM !== 'undefined' ? ROOM.round : '';
+  btn.style.display = (hasTests && round === 'DSA') ? 'inline-flex' : 'none';
+}
+
+/** Shared helper — set console output state. */
+function _setOutput(stdout, stderr, meta, color) {
+  const out    = document.getElementById('otxt');
+  const errEl  = document.getElementById('otxt-err');
+  const testEl = document.getElementById('otxt-tests');
+  const metaEl = document.getElementById('out-meta');
+
+  if (testEl) testEl.style.display = 'none';
+
+  if (out) {
+    out.style.color = color || '#aaffaa';
+    out.textContent = stdout || '(no output)';
+  }
+  if (errEl) {
+    errEl.style.display = stderr ? 'block' : 'none';
+    errEl.textContent   = stderr || '';
+  }
+  if (metaEl) {
+    metaEl.textContent = meta || '';
+  }
+}
+
 /**
- * runCodeSimulate — simulate code execution via Claude.
- * Runs in O(1) DOM ops; result displayed in #otxt.
+ * runCode — execute the current editor contents via Piston.
+ * Replaces the old Claude-simulated runCodeSimulate().
  */
-async function runCodeSimulate() {
-  const code = document.getElementById('ced').value;
-  const lang = document.getElementById('lsel').value;
-  const out  = document.getElementById('otxt');
-  if (!code.trim()) { out.textContent = '$ No code to run.'; return; }
+async function runCode() {
+  const code = document.getElementById('ced')?.value || '';
+  const lang = document.getElementById('lsel')?.value || 'python';
+  const btn  = document.getElementById('run-btn');
 
-  out.style.color = '#888';
-  out.textContent = '$ Running...';
+  if (!code.trim()) {
+    _setOutput('$ Write some code first.', '', '', 'var(--mut)');
+    return;
+  }
 
-  const prob = ROOM.problem;
-  const r = await callClaude(
-    [{ role: 'user', content: `Simulate running this ${lang} code${prob ? ` for "${prob.title}"` : ''}. Show realistic output (3-5 lines):\n${code.substring(0,500)}` }],
-    'Code execution simulator. Output only — no explanation. 3-5 lines max.'
+  // Disable button, show spinner
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Running…'; }
+  _setOutput('Running via Piston…', '', '', 'var(--mut)');
+
+  const result = await CODE_RUNNER.run(code, lang);
+
+  if (btn) { btn.disabled = false; btn.textContent = '▶ Run'; }
+
+  if (result.error) {
+    _setOutput('', result.error, '', '#ef4444');
+    return;
+  }
+
+  // Compile error (Java / C++)
+  if (result.compileErr && !result.stdout && !result.stderr) {
+    _setOutput(
+      result.stdout || '',
+      '⚠ Compile error:\n' + result.compileErr,
+      `${result.language} ${result.version} · ${result.ms}ms`,
+      '#f59e0b'
+    );
+    return;
+  }
+
+  // Successful run
+  const exitInfo = result.exitCode !== 0
+    ? `  ✗ exit ${result.exitCode}${result.signal ? ' (' + result.signal + ')' : ''}`
+    : '  ✓ exit 0';
+
+  _setOutput(
+    result.stdout || '(no output — add print() statements)',
+    result.stderr || result.compileErr || '',
+    `${result.language} ${result.version} · ${result.ms}ms${exitInfo}`,
+    result.exitCode === 0 ? '#aaffaa' : '#f59e0b'
   );
-  out.style.color = '#aaffaa';
-  out.textContent = r ? `$ ${r}` : '$ (no output — add test cases or print statements)';
+}
+
+/**
+ * runTests — execute user code against problem test cases via Piston.
+ * Only available for DSA problems that have testCases defined.
+ */
+async function runTests() {
+  const code = document.getElementById('ced')?.value || '';
+  const lang = document.getElementById('lsel')?.value || 'python';
+  const prob = typeof ROOM !== 'undefined' ? ROOM.problem : null;
+  const btn  = document.getElementById('test-btn');
+
+  if (!code.trim()) {
+    _setOutput('$ Write some code first.', '', '', 'var(--mut)');
+    return;
+  }
+  if (!prob?.testCases?.length) {
+    _setOutput('$ No test cases available for this problem.', '', '', 'var(--mut)');
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Testing…'; }
+
+  const out    = document.getElementById('otxt');
+  const errEl  = document.getElementById('otxt-err');
+  const testEl = document.getElementById('otxt-tests');
+  const metaEl = document.getElementById('out-meta');
+
+  if (out)   out.textContent   = 'Running test cases via Piston…';
+  if (errEl) errEl.style.display = 'none';
+
+  const result = await CODE_RUNNER.runWithTests(code, lang, prob.testCases);
+
+  if (btn) { btn.disabled = false; btn.textContent = '▶ Tests'; }
+
+  // Network / config error
+  if (result.error) {
+    _setOutput('', result.error, '', '#ef4444');
+    return;
+  }
+
+  // Language doesn't support auto-runner
+  if (result.message) {
+    _setOutput(result.raw?.stdout || '', result.message, '', '#f59e0b');
+    return;
+  }
+
+  // Render structured test results
+  const { results, passed, total, userStdout, raw } = result;
+
+  if (out)   out.textContent   = userStdout || '';
+  if (metaEl) metaEl.textContent = `${raw?.language} ${raw?.version} · ${raw?.ms}ms`;
+
+  if (testEl) {
+    testEl.style.display = 'block';
+    testEl.innerHTML = '';
+
+    // Summary bar
+    const allPass = passed === total;
+    const summary = document.createElement('div');
+    summary.style.cssText = `padding:5px 10px;font-size:0.72rem;font-weight:700;
+      border-top:1px solid rgba(255,255,255,0.06);
+      color:${allPass ? '#22c55e' : passed > 0 ? '#f59e0b' : '#ef4444'}`;
+    summary.textContent = `${allPass ? '✓' : '✗'} ${passed}/${total} test cases passed`;
+    testEl.appendChild(summary);
+
+    // Individual test rows
+    (results || []).forEach((r, i) => {
+      if (!r) return;
+      const row   = document.createElement('div');
+      const icon  = r.passed ? '✓' : '✗';
+      const color = r.passed ? '#22c55e' : '#ef4444';
+      row.style.cssText = `display:flex;flex-direction:column;gap:2px;padding:5px 10px;
+        border-top:1px solid rgba(255,255,255,0.04);font-size:0.68rem`;
+      row.innerHTML = `
+        <div style="color:${color};font-weight:600">${icon} Test ${i + 1}</div>
+        ${r.error
+          ? `<div style="color:#f59e0b">Error: ${sanitise(r.error)}</div>`
+          : `<div style="color:var(--mut)">Got:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${sanitise(r.got)}</div>
+             <div style="color:var(--mut)">Expected: ${sanitise(r.expected)}</div>`}`;
+      testEl.appendChild(row);
+    });
+  }
 }
 </script>
 

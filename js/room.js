@@ -48,6 +48,9 @@ const ROOM = (() => {
     // Reset communication tracker for fresh session
     if (typeof COMM_TRACKER !== 'undefined') COMM_TRACKER.reset();
 
+    // Sync the "▶ Tests" button visibility for this problem
+    if (typeof _syncTestBtn === 'function') setTimeout(_syncTestBtn, 100);
+
     // Interviewer persona per round
     const personas = {
       DSA: { name: 'Priya Sharma',   role: 'Senior SDE-3 · Amazon',        emoji: '👩‍💻' },
@@ -380,11 +383,33 @@ const ROOM = (() => {
     if (!code?.trim()) { addSystemMsg('Write some code first!'); return; }
 
     _submitCount++;
-    APP.showRoomLoading('Analysing your solution...');
+    APP.showRoomLoading('Running your code…');
+
+    // === REAL EXECUTION via Piston ===
+    let execContext = '';
+    if (typeof CODE_RUNNER !== 'undefined') {
+      const execResult = await CODE_RUNNER.run(code, lang);
+
+      if (execResult.error) {
+        execContext = `\n\n[Execution failed: ${execResult.error}]`;
+      } else {
+        const hasCompileErr = execResult.compileErr && !execResult.stdout;
+        if (hasCompileErr) {
+          execContext = `\n\n[Compile error:\n${execResult.compileErr.substring(0, 400)}]`;
+        } else {
+          execContext = '\n\n[Execution output:]\n'
+            + (execResult.stdout ? `stdout:\n${execResult.stdout.substring(0, 500)}` : '(no stdout)')
+            + (execResult.stderr ? `\nstderr:\n${execResult.stderr.substring(0, 200)}` : '')
+            + `\nexit code: ${execResult.exitCode}`;
+        }
+      }
+    }
+
+    APP.showRoomLoading('Analysing your solution…');
 
     const reply = await callClaude(
-      [{ role: 'user', content: `Candidate submitted ${lang} solution for "${_problem.title}":\n\n${code}\n\nAs their FAANG interviewer, react: find a bug or weakness OR if correct, ask a follow-up challenge. 2-3 sentences.` }],
-      _problem.systemPrompt + '\nReact to a code submission as a FAANG SDE-3 interviewer.'
+      [{ role: 'user', content: `Candidate submitted ${lang} solution for "${_problem.title}":\n\n${code}${execContext}\n\nAs their FAANG interviewer, react to BOTH the code quality AND the actual runtime output above. Find a bug, edge case failure, or — if it looks correct — ask a follow-up challenge. 2-3 sentences.` }],
+      _problem.systemPrompt + '\nReact to a code submission as a FAANG SDE-3 interviewer. Reference the actual execution output if available.'
     );
 
     APP.hideRoomLoading();
