@@ -45,12 +45,6 @@ const ROOM = (() => {
     _ivBusy      = false;
     _lastActTime = Date.now();
 
-    // Reset communication tracker for fresh session
-    if (typeof COMM_TRACKER !== 'undefined') COMM_TRACKER.reset();
-
-    // Sync the "▶ Tests" button visibility for this problem
-    if (typeof _syncTestBtn === 'function') setTimeout(_syncTestBtn, 100);
-
     // Interviewer persona per round
     const personas = {
       DSA: { name: 'Priya Sharma',   role: 'Senior SDE-3 · Amazon',        emoji: '👩‍💻' },
@@ -160,9 +154,6 @@ const ROOM = (() => {
     addMsg(text, 'me', 'You');
     _wordCount += text.split(/\s+/).length;
     _updateSpeechStats();
-
-    // Log to communication tracker
-    if (typeof COMM_TRACKER !== 'undefined') COMM_TRACKER.addMessage(text);
 
     _history.push({ role: 'user', content: text });
     if (_history.length > CONFIG.HISTORY_CAP) _history = _history.slice(-CONFIG.HISTORY_CAP);
@@ -283,7 +274,6 @@ const ROOM = (() => {
       const msg = nudges[Math.floor(Math.random() * nudges.length)];
       _triggerInterrupt(msg, 'prob');
       _lastActTime = Date.now();   // reset so we don't spam
-      if (typeof COMM_TRACKER !== 'undefined') COMM_TRACKER.addSilenceNudge();
     }
   }
 
@@ -383,33 +373,11 @@ const ROOM = (() => {
     if (!code?.trim()) { addSystemMsg('Write some code first!'); return; }
 
     _submitCount++;
-    APP.showRoomLoading('Running your code…');
-
-    // === REAL EXECUTION via Piston ===
-    let execContext = '';
-    if (typeof CODE_RUNNER !== 'undefined') {
-      const execResult = await CODE_RUNNER.run(code, lang);
-
-      if (execResult.error) {
-        execContext = `\n\n[Execution failed: ${execResult.error}]`;
-      } else {
-        const hasCompileErr = execResult.compileErr && !execResult.stdout;
-        if (hasCompileErr) {
-          execContext = `\n\n[Compile error:\n${execResult.compileErr.substring(0, 400)}]`;
-        } else {
-          execContext = '\n\n[Execution output:]\n'
-            + (execResult.stdout ? `stdout:\n${execResult.stdout.substring(0, 500)}` : '(no stdout)')
-            + (execResult.stderr ? `\nstderr:\n${execResult.stderr.substring(0, 200)}` : '')
-            + `\nexit code: ${execResult.exitCode}`;
-        }
-      }
-    }
-
-    APP.showRoomLoading('Analysing your solution…');
+    APP.showRoomLoading('Analysing your solution...');
 
     const reply = await callClaude(
-      [{ role: 'user', content: `Candidate submitted ${lang} solution for "${_problem.title}":\n\n${code}${execContext}\n\nAs their FAANG interviewer, react to BOTH the code quality AND the actual runtime output above. Find a bug, edge case failure, or — if it looks correct — ask a follow-up challenge. 2-3 sentences.` }],
-      _problem.systemPrompt + '\nReact to a code submission as a FAANG SDE-3 interviewer. Reference the actual execution output if available.'
+      [{ role: 'user', content: `Candidate submitted ${lang} solution for "${_problem.title}":\n\n${code}\n\nAs their FAANG interviewer, react: find a bug or weakness OR if correct, ask a follow-up challenge. 2-3 sentences.` }],
+      _problem.systemPrompt + '\nReact to a code submission as a FAANG SDE-3 interviewer.'
     );
 
     APP.hideRoomLoading();
@@ -436,61 +404,18 @@ const ROOM = (() => {
 
     APP.showRoomLoading('Generating your detailed feedback...');
 
-    const commNotes = typeof COMM_TRACKER !== 'undefined'
-      ? COMM_TRACKER.getSummary()
-      : '';
-
     const fb = await generateFeedback({
-      round:       _round,
-      problem:     _problem,
-      history:     _history,
+      round: _round,
+      problem: _problem,
+      history: _history,
       code,
       timeUsedSec,
       msgCount:    _msgCount,
       submitCount: _submitCount,
-      commNotes,
     });
 
-    // Snapshot previous sessions BEFORE saving current one so the
-    // comparison in the feedback report is truly "vs your history"
-    const prevSessions = typeof HISTORY !== 'undefined'
-      ? HISTORY.getByRound(_round)
-      : [];
-
-    // Persist session to localStorage
-    if (typeof HISTORY !== 'undefined') {
-      const rawComm = typeof COMM_TRACKER !== 'undefined' ? COMM_TRACKER.getData() : {};
-      HISTORY.add({
-        ts:         Date.now(),
-        round:      _round,
-        problem: {
-          id:         _problem.id         || '',
-          title:      _problem.title      || '',
-          difficulty: _problem.difficulty || 'medium',
-        },
-        durationMin:  Math.round(timeUsedSec / 60),
-        msgCount:     _msgCount,
-        submitCount:  _submitCount,
-        overall:      fb.overall  || 0,
-        verdict:      fb.verdict  || '',
-        sde3Level:    fb.sde3Assessment?.currentLevel || '',
-        categories:   (fb.categories || []).map(c => ({ name: c.name, score: c.score })),
-        commStats: {
-          totalWords:       rawComm.totalWords       || 0,
-          voiceWords:       rawComm.voiceWords       || 0,
-          typedWords:       rawComm.typedWords       || 0,
-          fillerTotal:      rawComm.fillerTotal      || 0,
-          fillerByType:     rawComm.fillerByType     || {},
-          clarifyingQs:     rawComm.clarifyingQs     || 0,
-          silenceNudges:    rawComm.silenceNudges    || 0,
-          thinkAloudBursts: rawComm.thinkAloudBursts || 0,
-          speakingMs:       rawComm.speakingMs       || 0,
-        },
-      });
-    }
-
     APP.hideRoomLoading();
-    renderFeedback(fb, _problem, _round, prevSessions);
+    renderFeedback(fb, _problem, _round);
     APP.showScreen('feedback');
   }
 

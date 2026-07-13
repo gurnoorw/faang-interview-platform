@@ -14,7 +14,6 @@
   <link rel="stylesheet" href="css/room.css"/>
   <link rel="stylesheet" href="css/feedback.css"/>
   <link rel="stylesheet" href="css/airound.css"/>
-  <link rel="stylesheet" href="css/progress.css"/>
 </head>
 <body>
 
@@ -27,32 +26,9 @@
   <div class="home-inner">
 
     <!-- Header -->
-    <div style="display:flex;align-items:flex-start;justify-content:space-between">
-      <div>
-        <div class="home-tag">SDE-3 · FAANG Prep · Bangalore</div>
-        <div class="home-h1">Mock Interview Platform</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button onclick="goProgress()"
-                title="View performance dashboard"
-                style="background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);
-                       border-radius:8px;padding:0.45rem 0.75rem;cursor:pointer;color:var(--acc2);
-                       font-size:0.78rem;display:flex;align-items:center;gap:5px;
-                       transition:background .15s,border-color .15s;font-family:var(--sans)"
-                onmouseover="this.style.background='rgba(124,111,255,0.22)'"
-                onmouseout="this.style.background='rgba(124,111,255,0.12)'">
-          📊 Progress
-        </button>
-        <button onclick="showApiKeyModal()"
-                title="Update API key"
-                style="background:transparent;border:1px solid var(--brd);border-radius:8px;
-                       padding:0.45rem 0.65rem;cursor:pointer;color:var(--mut);font-size:0.8rem;
-                       display:flex;align-items:center;gap:5px;transition:color .15s,border-color .15s"
-                onmouseover="this.style.color='var(--fg)';this.style.borderColor='var(--acc2)'"
-                onmouseout="this.style.color='var(--mut)';this.style.borderColor='var(--brd)'">
-          <i class="ti ti-key" style="font-size:13px"></i> API Key
-        </button>
-      </div>
+    <div>
+      <div class="home-tag">SDE-3 · FAANG Prep · Bangalore</div>
+      <div class="home-h1">Mock Interview Platform</div>
     </div>
 
     <!-- Mode toggle -->
@@ -241,7 +217,6 @@
      ROOM SCREEN
      3-column layout: [interviewer+chat] [tabs+content] [live eval]
 ══════════════════════════════════════════════════════════════════════ -->
-
 <div id="room" class="screen">
 
   <!-- Loading overlay -->
@@ -305,12 +280,6 @@
       <!-- Chat messages -->
       <div class="chat-zone" id="chat" aria-live="polite" aria-label="Chat with interviewer"></div>
 
-      <!-- Live voice transcription (shown when mic is on) -->
-      <div class="voice-transcript" id="voice-transcript" aria-live="polite">
-        <div class="vt-header"><span class="vt-dot"></span>Hearing you</div>
-        <div id="vt-text" class="vt-text">...</div>
-      </div>
-
       <!-- Message input -->
       <div class="inp-row">
         <input class="cinp" id="cinp"
@@ -360,8 +329,7 @@
               <option value="cpp">C++</option>
               <option value="javascript">JavaScript</option>
             </select>
-            <button class="rbtn" id="run-btn" onclick="runCode()">▶ Run</button>
-            <button class="rbtn" id="test-btn" onclick="runTests()" style="display:none;background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.3);color:#22c55e" title="Run against problem test cases">▶ Tests</button>
+            <button class="rbtn" onclick="runCodeSimulate()">▶ Run</button>
             <button class="sbtn" onclick="ROOM.submitCode()">Submit ↗</button>
           </div>
           <div class="edwrap">
@@ -389,16 +357,8 @@
               <span class="od" style="background:#f59e0b" aria-hidden="true"></span>
               <span class="od" style="background:#22c55e" aria-hidden="true"></span>
               <span style="margin-left:5px">Console</span>
-              <span id="out-meta" style="margin-left:auto;font-size:0.6rem;color:var(--mut)"></span>
             </div>
-            <!-- stdout -->
-            <div id="otxt">Run your code to see output…</div>
-            <!-- stderr / compile errors — hidden when empty -->
-            <div id="otxt-err" style="display:none;color:#ef4444;font-size:0.7rem;
-                 padding:4px 10px;border-top:1px solid rgba(239,68,68,0.2);
-                 white-space:pre-wrap;font-family:monospace"></div>
-            <!-- test case results — hidden when not in test mode -->
-            <div id="otxt-tests" style="display:none"></div>
+            <div id="otxt">Run your code to see output...</div>
           </div>
         </div>
 
@@ -486,36 +446,48 @@
       </div><!-- /pbody -->
     </div><!-- /ctr-col -->
 
-    <!-- ── RIGHT: Performance Tracker (scores locked until end) ── -->
+    <!-- ── RIGHT: Live Eval ── -->
     <div class="ev-col">
-      <div class="evh"><span class="ldot" aria-hidden="true"></span>Session tracker</div>
+      <div class="evh"><span class="ldot" aria-hidden="true"></span>Live tracking</div>
       <div class="evb">
 
-        <!-- Hidden score elements — still updated by JS, revealed in feedback screen -->
-        <div style="display:none">
-          <div id="sc-ps"></div><div id="fl-ps"></div><div id="nt-ps"></div>
-          <div id="sc-cm"></div><div id="fl-cm"></div><div id="nt-cm"></div>
-          <div id="sc-cq"></div><div id="fl-cq"></div><div id="nt-cq"></div>
-          <div id="sc-tm"></div><div id="fl-tm"></div><div id="nt-tm"></div>
+        <div class="evm">
+          <div class="eml">Problem solving</div>
+          <div class="ems sm" id="sc-ps">—</div>
+          <div class="embar"><div class="emf fm" id="fl-ps" style="width:0%"></div></div>
+          <div class="emn" id="nt-ps">Watching...</div>
         </div>
 
-        <!-- Locked banner -->
-        <div class="ev-locked-banner">
-          <div class="ev-locked-icon">🔒</div>
-          <div class="ev-locked-title">Results locked</div>
-          <div class="ev-locked-sub">Detailed scores &amp; rubric analysis revealed after<br><strong>End &amp; Evaluate</strong></div>
+        <div class="evm">
+          <div class="eml">Communication</div>
+          <div class="ems sm" id="sc-cm">—</div>
+          <div class="embar"><div class="emf fm" id="fl-cm" style="width:0%"></div></div>
+          <div class="emn" id="nt-cm">Start explaining</div>
         </div>
 
-        <!-- Pressure meter (useful live signal, not a score) -->
+        <div class="evm">
+          <div class="eml">Code / Design quality</div>
+          <div class="ems sm" id="sc-cq">—</div>
+          <div class="embar"><div class="emf fm" id="fl-cq" style="width:0%"></div></div>
+          <div class="emn" id="nt-cq">Write code to evaluate</div>
+        </div>
+
+        <div class="evm">
+          <div class="eml">Time management</div>
+          <div class="ems sg" id="sc-tm">Good</div>
+          <div class="embar"><div class="emf fg" id="fl-tm" style="width:78%"></div></div>
+          <div class="emn" id="nt-tm">On track</div>
+        </div>
+
         <div class="pz">
           <div class="pzl">Interview pressure</div>
           <div class="pzbar"><div class="pzf pz-lo" id="pzf" style="width:18%"></div></div>
           <div class="pzlbl pz-lo" id="pzlbl">Low — warming up</div>
         </div>
 
-        <!-- Voice waveform -->
+        <!-- Speech waveform -->
         <div class="evm" style="padding:0.45rem">
-          <div class="eml" style="margin-bottom:5px">Voice activity</div>
+          <div class="eml" style="margin-bottom:5px">Speech</div>
           <div class="wvfrm" id="wvfrm" aria-hidden="true">
             <div class="wb3"></div><div class="wb3"></div><div class="wb3"></div>
             <div class="wb3"></div><div class="wb3"></div><div class="wb3"></div>
@@ -525,33 +497,6 @@
           <div class="spst">
             <div class="ss"><div class="ssn" id="wpm">—</div><div class="ssl">WPM</div></div>
             <div class="ss"><div class="ssn" id="fill">—</div><div class="ssl">Fillers</div></div>
-          </div>
-        </div>
-
-        <!-- Live communication log (counts, not scores) -->
-        <div class="evm">
-          <div class="eml" style="margin-bottom:6px">Communication log</div>
-          <div class="ev-session-log">
-            <div class="ev-log-row">
-              <span>💬 Words spoken</span>
-              <span class="ev-log-val" id="evl-words">0</span>
-            </div>
-            <div class="ev-log-row">
-              <span>📨 Messages sent</span>
-              <span class="ev-log-val" id="evl-msgs">0</span>
-            </div>
-            <div class="ev-log-row">
-              <span>❓ Clarifying Qs</span>
-              <span class="ev-log-val" id="evl-clarit">0</span>
-            </div>
-            <div class="ev-log-row">
-              <span>🗣️ Filler words</span>
-              <span class="ev-log-val ev-log-filler" id="evl-fillers">0</span>
-            </div>
-            <div class="ev-log-row">
-              <span>🔇 Silence nudges</span>
-              <span class="ev-log-val" id="evl-silence">0</span>
-            </div>
           </div>
         </div>
 
@@ -592,54 +537,8 @@
     <button class="fba fba-p" onclick="retryRound()">Retry this problem</button>
     <button class="fba fba-g" onclick="goHome()">Pick another problem</button>
     <button class="fba fba-g" onclick="exportFeedbackReport()">Export report</button>
-    <button class="fba fba-g" onclick="goProgress()" style="background:rgba(124,111,255,0.15);border-color:rgba(124,111,255,0.3);color:var(--acc2)">📊 Progress dashboard</button>
   </div>
 </div><!-- /feedback -->
-
-
-<!-- ════════════════════════════════════════════════════════════════════
-     PROGRESS / PERFORMANCE DASHBOARD SCREEN
-══════════════════════════════════════════════════════════════════════ -->
-<div id="progress" class="screen">
-  <div class="prog-inner">
-
-    <!-- Header -->
-    <div class="prog-header">
-      <button class="bk" onclick="goHome()" title="Back to home"
-              style="background:none;border:1px solid var(--brd);border-radius:8px;
-                     padding:6px 12px;color:var(--mut);cursor:pointer;font-size:0.78rem;
-                     font-family:var(--sans);transition:color .15s,border-color .15s"
-              onmouseover="this.style.color='var(--fg)';this.style.borderColor='var(--acc)'"
-              onmouseout="this.style.color='var(--mut)';this.style.borderColor='var(--brd)'">
-        ← Home
-      </button>
-      <div style="flex:1">
-        <div class="prog-title">📊 Performance Dashboard</div>
-        <div class="prog-sub" id="prog-session-count">Loading…</div>
-      </div>
-      <button onclick="clearHistory()" class="prog-clear-btn" title="Delete all recorded sessions">
-        🗑 Clear history
-      </button>
-    </div>
-
-    <!-- Stats bar (rendered by progress.js) -->
-    <div class="prog-stats-bar" id="prog-stats-bar"></div>
-
-    <!-- Round filter tabs -->
-    <div class="prog-tab-row">
-      <button class="ptab active" data-round="all"  onclick="progTab('all',this)">Overview</button>
-      <button class="ptab"        data-round="DSA"  onclick="progTab('DSA',this)">⚡ DSA</button>
-      <button class="ptab"        data-round="HLD"  onclick="progTab('HLD',this)">🏗️ HLD</button>
-      <button class="ptab"        data-round="LLD"  onclick="progTab('LLD',this)">🔧 LLD</button>
-      <button class="ptab"        data-round="BEH"  onclick="progTab('BEH',this)">💬 BEH</button>
-      <button class="ptab"        data-round="AI"   onclick="progTab('AI',this)">🤖 AI</button>
-    </div>
-
-    <!-- Dynamic content rendered by progress.js -->
-    <div id="prog-content"></div>
-
-  </div>
-</div>
 
 
 <!-- ════════════════════════════════════════════════════════════════════
@@ -658,57 +557,6 @@
 
 <div id="toast" role="status" aria-live="polite"></div>
 
-<!-- ════════════════════════════════════════════════════════════════════
-     API KEY SETUP MODAL
-══════════════════════════════════════════════════════════════════════ -->
-<div id="api-key-modal" role="dialog" aria-modal="true" aria-labelledby="akm-title"
-     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;
-            align-items:center;justify-content:center;">
-  <div style="background:var(--srf);border:1px solid var(--brd);border-radius:14px;
-              padding:2rem;max-width:420px;width:90%;display:flex;flex-direction:column;gap:1.2rem">
-
-    <div>
-      <div style="font-size:1.5rem;margin-bottom:0.25rem">🔑</div>
-      <div id="akm-title" style="font-size:1rem;font-weight:700;color:var(--fg)">Anthropic API Key</div>
-      <div style="font-size:0.75rem;color:var(--mut);margin-top:0.3rem;line-height:1.6">
-        This platform calls Claude directly from your browser.
-        Your key is stored only in <code>localStorage</code> — never sent anywhere except Anthropic.
-      </div>
-    </div>
-
-    <div id="akm-error" style="display:none;font-size:0.72rem;color:#ef4444;
-         background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
-         border-radius:6px;padding:8px 10px"></div>
-
-    <div style="display:flex;flex-direction:column;gap:0.5rem">
-      <label style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;
-                    font-weight:600;color:var(--mut)">API Key</label>
-      <input id="akm-input" type="password"
-             placeholder="sk-ant-api03-..."
-             style="background:var(--bg);border:1px solid var(--brd);border-radius:8px;
-                    padding:0.6rem 0.8rem;color:var(--fg);font-size:0.85rem;outline:none;
-                    font-family:monospace"
-             onkeydown="if(event.key==='Enter') saveApiKey()"/>
-    </div>
-
-    <div style="font-size:0.7rem;color:var(--mut);line-height:1.6">
-      Get a key at
-      <a href="https://console.anthropic.com/settings/keys" target="_blank"
-         style="color:var(--acc2)">console.anthropic.com</a>.
-      Free tier works fine for practice sessions.
-    </div>
-
-    <button onclick="saveApiKey()"
-            style="background:var(--acc2);color:#fff;border:none;border-radius:8px;
-                   padding:0.65rem 1.2rem;font-size:0.82rem;font-weight:600;cursor:pointer;
-                   transition:opacity .15s"
-            onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-      Save &amp; Continue →
-    </button>
-
-  </div>
-</div>
-
 
 <!-- ════════════════════════════════════════════════════════════════════
      SCRIPTS — load order matters:
@@ -722,216 +570,31 @@
 <script src="js/airound.js"></script>
 <script src="js/feedback.js"></script>
 <script src="js/interviewer.js"></script>
-<script src="js/executor.js"></script>
 <script src="js/room.js"></script>
-<script src="js/history.js"></script>
-<script src="js/progress.js"></script>
 <script src="js/app.js"></script>
 
 <!-- Inline glue: small helpers that don't warrant their own file -->
 <script>
 /**
- * API key modal helpers
+ * runCodeSimulate — simulate code execution via Claude.
+ * Runs in O(1) DOM ops; result displayed in #otxt.
  */
-function showApiKeyModal(errMsg) {
-  const modal = document.getElementById('api-key-modal');
-  const errEl = document.getElementById('akm-error');
-  if (errMsg) {
-    errEl.textContent = errMsg;
-    errEl.style.display = 'block';
-  } else {
-    errEl.style.display = 'none';
-  }
-  modal.style.display = 'flex';
-  setTimeout(() => document.getElementById('akm-input')?.focus(), 50);
-}
+async function runCodeSimulate() {
+  const code = document.getElementById('ced').value;
+  const lang = document.getElementById('lsel').value;
+  const out  = document.getElementById('otxt');
+  if (!code.trim()) { out.textContent = '$ No code to run.'; return; }
 
-function saveApiKey() {
-  const val = document.getElementById('akm-input')?.value.trim();
-  if (!val || !val.startsWith('sk-ant-')) {
-    document.getElementById('akm-error').textContent =
-      'Key must start with sk-ant- — double-check and try again.';
-    document.getElementById('akm-error').style.display = 'block';
-    return;
-  }
-  localStorage.setItem('anthropic_api_key', val);
-  window._ANTHROPIC_KEY = val;
-  document.getElementById('api-key-modal').style.display = 'none';
-  document.getElementById('akm-input').value = '';
-  // Show a toast confirmation
-  const t = document.getElementById('toast');
-  if (t) { t.textContent = '✓ API key saved'; t.className = 'show'; setTimeout(() => t.className = '', 2500); }
-}
+  out.style.color = '#888';
+  out.textContent = '$ Running...';
 
-/* ════════════════════════════════════════════════════════════════════════
-   CODE EXECUTION — powered by Piston (https://github.com/engineer-man/piston)
-   Free, open-source, no API key. Public endpoint: emkc.org/api/v2/piston
-════════════════════════════════════════════════════════════════════════ */
-
-/** Show/hide the "▶ Tests" button based on whether the current problem has test cases. */
-function _syncTestBtn() {
-  const prob = typeof ROOM !== 'undefined' ? ROOM.problem : null;
-  const btn  = document.getElementById('test-btn');
-  if (!btn) return;
-  const hasTests = prob && Array.isArray(prob.testCases) && prob.testCases.length > 0;
-  const round    = typeof ROOM !== 'undefined' ? ROOM.round : '';
-  btn.style.display = (hasTests && round === 'DSA') ? 'inline-flex' : 'none';
-}
-
-/** Shared helper — set console output state. */
-function _setOutput(stdout, stderr, meta, color) {
-  const out    = document.getElementById('otxt');
-  const errEl  = document.getElementById('otxt-err');
-  const testEl = document.getElementById('otxt-tests');
-  const metaEl = document.getElementById('out-meta');
-
-  if (testEl) testEl.style.display = 'none';
-
-  if (out) {
-    out.style.color = color || '#aaffaa';
-    out.textContent = stdout || '(no output)';
-  }
-  if (errEl) {
-    errEl.style.display = stderr ? 'block' : 'none';
-    errEl.textContent   = stderr || '';
-  }
-  if (metaEl) {
-    metaEl.textContent = meta || '';
-  }
-}
-
-/**
- * runCode — execute the current editor contents via Piston.
- * Replaces the old Claude-simulated runCodeSimulate().
- */
-async function runCode() {
-  const code = document.getElementById('ced')?.value || '';
-  const lang = document.getElementById('lsel')?.value || 'python';
-  const btn  = document.getElementById('run-btn');
-
-  if (!code.trim()) {
-    _setOutput('$ Write some code first.', '', '', 'var(--mut)');
-    return;
-  }
-
-  // Disable button, show spinner
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Running…'; }
-  _setOutput('Running via Piston…', '', '', 'var(--mut)');
-
-  const result = await CODE_RUNNER.run(code, lang);
-
-  if (btn) { btn.disabled = false; btn.textContent = '▶ Run'; }
-
-  if (result.error) {
-    _setOutput('', result.error, '', '#ef4444');
-    return;
-  }
-
-  // Compile error (Java / C++)
-  if (result.compileErr && !result.stdout && !result.stderr) {
-    _setOutput(
-      result.stdout || '',
-      '⚠ Compile error:\n' + result.compileErr,
-      `${result.language} ${result.version} · ${result.ms}ms`,
-      '#f59e0b'
-    );
-    return;
-  }
-
-  // Successful run
-  const exitInfo = result.exitCode !== 0
-    ? `  ✗ exit ${result.exitCode}${result.signal ? ' (' + result.signal + ')' : ''}`
-    : '  ✓ exit 0';
-
-  _setOutput(
-    result.stdout || '(no output — add print() statements)',
-    result.stderr || result.compileErr || '',
-    `${result.language} ${result.version} · ${result.ms}ms${exitInfo}`,
-    result.exitCode === 0 ? '#aaffaa' : '#f59e0b'
+  const prob = ROOM.problem;
+  const r = await callClaude(
+    [{ role: 'user', content: `Simulate running this ${lang} code${prob ? ` for "${prob.title}"` : ''}. Show realistic output (3-5 lines):\n${code.substring(0,500)}` }],
+    'Code execution simulator. Output only — no explanation. 3-5 lines max.'
   );
-}
-
-/**
- * runTests — execute user code against problem test cases via Piston.
- * Only available for DSA problems that have testCases defined.
- */
-async function runTests() {
-  const code = document.getElementById('ced')?.value || '';
-  const lang = document.getElementById('lsel')?.value || 'python';
-  const prob = typeof ROOM !== 'undefined' ? ROOM.problem : null;
-  const btn  = document.getElementById('test-btn');
-
-  if (!code.trim()) {
-    _setOutput('$ Write some code first.', '', '', 'var(--mut)');
-    return;
-  }
-  if (!prob?.testCases?.length) {
-    _setOutput('$ No test cases available for this problem.', '', '', 'var(--mut)');
-    return;
-  }
-
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Testing…'; }
-
-  const out    = document.getElementById('otxt');
-  const errEl  = document.getElementById('otxt-err');
-  const testEl = document.getElementById('otxt-tests');
-  const metaEl = document.getElementById('out-meta');
-
-  if (out)   out.textContent   = 'Running test cases via Piston…';
-  if (errEl) errEl.style.display = 'none';
-
-  const result = await CODE_RUNNER.runWithTests(code, lang, prob.testCases);
-
-  if (btn) { btn.disabled = false; btn.textContent = '▶ Tests'; }
-
-  // Network / config error
-  if (result.error) {
-    _setOutput('', result.error, '', '#ef4444');
-    return;
-  }
-
-  // Language doesn't support auto-runner
-  if (result.message) {
-    _setOutput(result.raw?.stdout || '', result.message, '', '#f59e0b');
-    return;
-  }
-
-  // Render structured test results
-  const { results, passed, total, userStdout, raw } = result;
-
-  if (out)   out.textContent   = userStdout || '';
-  if (metaEl) metaEl.textContent = `${raw?.language} ${raw?.version} · ${raw?.ms}ms`;
-
-  if (testEl) {
-    testEl.style.display = 'block';
-    testEl.innerHTML = '';
-
-    // Summary bar
-    const allPass = passed === total;
-    const summary = document.createElement('div');
-    summary.style.cssText = `padding:5px 10px;font-size:0.72rem;font-weight:700;
-      border-top:1px solid rgba(255,255,255,0.06);
-      color:${allPass ? '#22c55e' : passed > 0 ? '#f59e0b' : '#ef4444'}`;
-    summary.textContent = `${allPass ? '✓' : '✗'} ${passed}/${total} test cases passed`;
-    testEl.appendChild(summary);
-
-    // Individual test rows
-    (results || []).forEach((r, i) => {
-      if (!r) return;
-      const row   = document.createElement('div');
-      const icon  = r.passed ? '✓' : '✗';
-      const color = r.passed ? '#22c55e' : '#ef4444';
-      row.style.cssText = `display:flex;flex-direction:column;gap:2px;padding:5px 10px;
-        border-top:1px solid rgba(255,255,255,0.04);font-size:0.68rem`;
-      row.innerHTML = `
-        <div style="color:${color};font-weight:600">${icon} Test ${i + 1}</div>
-        ${r.error
-          ? `<div style="color:#f59e0b">Error: ${sanitise(r.error)}</div>`
-          : `<div style="color:var(--mut)">Got:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${sanitise(r.got)}</div>
-             <div style="color:var(--mut)">Expected: ${sanitise(r.expected)}</div>`}`;
-      testEl.appendChild(row);
-    });
-  }
+  out.style.color = '#aaffaa';
+  out.textContent = r ? `$ ${r}` : '$ (no output — add test cases or print statements)';
 }
 </script>
 
