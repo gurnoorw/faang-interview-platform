@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign up — FAANG Interview Pro</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/tabler-icons.min.css"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d0d12;--bg2:#13131e;--bg3:#1a1a28;--bdr:rgba(124,111,255,0.18);
+      --acc:#7c6fff;--acc2:#a78bfa;--red:#ef4444;--grn:#22c55e;
+      --txt:#eeeeff;--mut:#6868a0;--sans:'Plus Jakarta Sans',sans-serif;
+    }
+    body{background:var(--bg);color:var(--txt);font-family:var(--sans);
+      min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;
+      background:radial-gradient(ellipse at 50% 0%,rgba(124,111,255,0.1) 0%,transparent 60%),var(--bg)}
+    .card{background:var(--bg2);border:1px solid var(--bdr);border-radius:18px;padding:2rem;width:100%;max-width:420px}
+    .logo{font-size:1rem;font-weight:800;text-align:center;margin-bottom:1.5rem;
+      background:linear-gradient(135deg,#fff 20%,var(--acc2) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    h1{font-size:1.35rem;font-weight:700;text-align:center;margin-bottom:0.35rem}
+    .sub{font-size:0.8rem;color:var(--mut);text-align:center;margin-bottom:1.75rem}
+    .field{display:flex;flex-direction:column;gap:5px;margin-bottom:1rem}
+    label{font-size:0.7rem;color:var(--mut);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+    input{background:var(--bg3);border:1px solid var(--bdr);border-radius:9px;color:var(--txt);
+      font-family:var(--sans);font-size:0.88rem;padding:10px 12px;outline:none;transition:border-color 0.15s;width:100%}
+    input:focus{border-color:var(--acc)}
+    input::placeholder{color:var(--mut)}
+    .btn{width:100%;background:var(--acc);border:none;color:white;
+      font-family:var(--sans);font-size:0.9rem;font-weight:700;
+      padding:12px;border-radius:9px;cursor:pointer;transition:all 0.15s;margin-top:0.25rem}
+    .btn:hover:not(:disabled){background:var(--acc2)}
+    .btn:disabled{opacity:0.5;cursor:not-allowed}
+    .divider{display:flex;align-items:center;gap:0.75rem;margin:1.25rem 0;font-size:0.72rem;color:var(--mut)}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--bdr)}
+    .switch{text-align:center;font-size:0.8rem;color:var(--mut);margin-top:1.25rem}
+    .switch a{color:var(--acc2);text-decoration:none;font-weight:600}
+    .err{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;
+      padding:8px 12px;font-size:0.78rem;color:#fca5a5;display:none;margin-bottom:0.75rem}
+    .ok{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;
+      padding:8px 12px;font-size:0.78rem;color:#86efac;display:none;margin-bottom:0.75rem}
+    .plan-summary{background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;
+      padding:0.9rem;margin-bottom:1.25rem;font-size:0.78rem}
+    .plan-summary strong{color:var(--acc2)}
+    .terms{font-size:0.68rem;color:var(--mut);text-align:center;margin-top:0.75rem;line-height:1.5}
+  </style>
+</head>
+<body>
+
+<div class="card" id="signup-card">
+  <div class="logo">FAANG Interview Pro</div>
+  <h1>Create your account</h1>
+  <p class="sub">Start practising with AI interviewers today</p>
+
+  <div class="plan-summary">
+    After signup you'll be taken to payment.<br>
+    <strong>₹2,000/month</strong> · Unlimited interviews · All 5 round types · Cancel anytime
+  </div>
+
+  <div class="err" id="su-err"></div>
+  <div class="ok"  id="su-ok"></div>
+
+  <div class="field">
+    <label for="su-name">Full name</label>
+    <input id="su-name" type="text" placeholder="Gurnoor Singh" autocomplete="name"/>
+  </div>
+  <div class="field">
+    <label for="su-email">Email</label>
+    <input id="su-email" type="email" placeholder="you@example.com" autocomplete="email"/>
+  </div>
+  <div class="field">
+    <label for="su-pass">Password (min 8 characters)</label>
+    <input id="su-pass" type="password" placeholder="••••••••" autocomplete="new-password"/>
+  </div>
+
+  <button class="btn" id="su-btn" onclick="doSignup()">Create Account →</button>
+  <p class="terms">By signing up you agree to our Terms of Service and Privacy Policy.</p>
+  <div class="divider">or</div>
+  <div class="switch">Already have an account? <a href="auth.html?mode=login">Log in</a></div>
+</div>
+
+<div class="card" id="login-card" style="display:none">
+  <div class="logo">FAANG Interview Pro</div>
+  <h1>Welcome back</h1>
+  <p class="sub">Log in to continue your interview prep</p>
+
+  <div class="err" id="li-err"></div>
+
+  <div class="field">
+    <label for="li-email">Email</label>
+    <input id="li-email" type="email" placeholder="you@example.com" autocomplete="email"/>
+  </div>
+  <div class="field">
+    <label for="li-pass">Password</label>
+    <input id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password"/>
+  </div>
+
+  <button class="btn" id="li-btn" onclick="doLogin()">Log In →</button>
+  <div class="divider">or</div>
+  <div class="switch">New here? <a href="auth.html?mode=signup">Create account</a></div>
+</div>
+
+<script>
+  // Read config from meta or window — set by your deployment
+  const API_BASE = window.API_BASE || 'http://localhost:3001';
+
+  /* ── Show correct card based on URL param ── */
+  const mode = new URLSearchParams(location.search).get('mode') || 'signup';
+  if (mode === 'login') {
+    document.getElementById('signup-card').style.display = 'none';
+    document.getElementById('login-card').style.display  = 'block';
+    document.title = 'Log in — FAANG Interview Pro';
+  }
+
+  function showErr(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg; el.style.display = 'block';
+  }
+  function hideErr(id) { document.getElementById(id).style.display = 'none'; }
+  function showOk(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg; el.style.display = 'block';
+  }
+
+  /* ── Signup ── */
+  async function doSignup() {
+    hideErr('su-err');
+    const name  = document.getElementById('su-name').value.trim();
+    const email = document.getElementById('su-email').value.trim();
+    const pass  = document.getElementById('su-pass').value;
+
+    if (!name || !email || !pass) return showErr('su-err', 'All fields are required.');
+    if (pass.length < 8)          return showErr('su-err', 'Password must be at least 8 characters.');
+
+    const btn = document.getElementById('su-btn');
+    btn.disabled = true; btn.textContent = 'Creating account...';
+
+    try {
+      const res  = await fetch(`${API_BASE}/api/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password: pass }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showErr('su-err', data.error || 'Signup failed.');
+        btn.disabled = false; btn.textContent = 'Create Account →';
+        return;
+      }
+
+      // Save token and redirect to payment
+      localStorage.setItem('faang_token', data.token);
+      localStorage.setItem('faang_user',  JSON.stringify(data.user));
+      showOk('su-ok', 'Account created! Redirecting to payment...');
+      setTimeout(() => { window.location.href = 'payment.html'; }, 1200);
+
+    } catch (e) {
+      showErr('su-err', 'Network error — is the server running?');
+      btn.disabled = false; btn.textContent = 'Create Account →';
+    }
+  }
+
+  /* ── Login ── */
+  async function doLogin() {
+    hideErr('li-err');
+    const email = document.getElementById('li-email').value.trim();
+    const pass  = document.getElementById('li-pass').value;
+    if (!email || !pass) return showErr('li-err', 'Email and password are required.');
+
+    const btn = document.getElementById('li-btn');
+    btn.disabled = true; btn.textContent = 'Logging in...';
+
+    try {
+      const res  = await fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showErr('li-err', data.error || 'Login failed.');
+        btn.disabled = false; btn.textContent = 'Log In →';
+        return;
+      }
+
+      localStorage.setItem('faang_token', data.token);
+      localStorage.setItem('faang_user',  JSON.stringify(data.user));
+
+      // Redirect: subscribed → app, not subscribed → payment
+      window.location.href = data.isSubscribed ? '../index.html' : 'payment.html';
+
+    } catch (e) {
+      showErr('li-err', 'Network error — is the server running?');
+      btn.disabled = false; btn.textContent = 'Log In →';
+    }
+  }
+
+  // Allow Enter key to submit
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (mode === 'login') doLogin(); else doSignup();
+    }
+  });
+</script>
+</body>
+</html>

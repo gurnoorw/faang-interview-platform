@@ -26,20 +26,9 @@
   <div class="home-inner">
 
     <!-- Header -->
-    <div style="display:flex;align-items:flex-start;justify-content:space-between">
-      <div>
-        <div class="home-tag">SDE-3 · FAANG Prep · Bangalore</div>
-        <div class="home-h1">Mock Interview Platform</div>
-      </div>
-      <button onclick="showApiKeyModal()"
-              title="Update API key"
-              style="background:transparent;border:1px solid var(--brd);border-radius:8px;
-                     padding:0.45rem 0.65rem;cursor:pointer;color:var(--mut);font-size:0.8rem;
-                     display:flex;align-items:center;gap:5px;transition:color .15s,border-color .15s"
-              onmouseover="this.style.color='var(--fg)';this.style.borderColor='var(--acc2)'"
-              onmouseout="this.style.color='var(--mut)';this.style.borderColor='var(--brd)'">
-        <i class="ti ti-key" style="font-size:13px"></i> API Key
-      </button>
+    <div>
+      <div class="home-tag">SDE-3 · FAANG Prep · Bangalore</div>
+      <div class="home-h1">Mock Interview Platform</div>
     </div>
 
     <!-- Mode toggle -->
@@ -228,7 +217,6 @@
      ROOM SCREEN
      3-column layout: [interviewer+chat] [tabs+content] [live eval]
 ══════════════════════════════════════════════════════════════════════ -->
-
 <div id="room" class="screen">
 
   <!-- Loading overlay -->
@@ -291,12 +279,6 @@
 
       <!-- Chat messages -->
       <div class="chat-zone" id="chat" aria-live="polite" aria-label="Chat with interviewer"></div>
-
-      <!-- Live voice transcription (shown when mic is on) -->
-      <div class="voice-transcript" id="voice-transcript" aria-live="polite">
-        <div class="vt-header"><span class="vt-dot"></span>Hearing you</div>
-        <div id="vt-text" class="vt-text">...</div>
-      </div>
 
       <!-- Message input -->
       <div class="inp-row">
@@ -464,36 +446,48 @@
       </div><!-- /pbody -->
     </div><!-- /ctr-col -->
 
-    <!-- ── RIGHT: Performance Tracker (scores locked until end) ── -->
+    <!-- ── RIGHT: Live Eval ── -->
     <div class="ev-col">
-      <div class="evh"><span class="ldot" aria-hidden="true"></span>Session tracker</div>
+      <div class="evh"><span class="ldot" aria-hidden="true"></span>Live tracking</div>
       <div class="evb">
 
-        <!-- Hidden score elements — still updated by JS, revealed in feedback screen -->
-        <div style="display:none">
-          <div id="sc-ps"></div><div id="fl-ps"></div><div id="nt-ps"></div>
-          <div id="sc-cm"></div><div id="fl-cm"></div><div id="nt-cm"></div>
-          <div id="sc-cq"></div><div id="fl-cq"></div><div id="nt-cq"></div>
-          <div id="sc-tm"></div><div id="fl-tm"></div><div id="nt-tm"></div>
+        <div class="evm">
+          <div class="eml">Problem solving</div>
+          <div class="ems sm" id="sc-ps">—</div>
+          <div class="embar"><div class="emf fm" id="fl-ps" style="width:0%"></div></div>
+          <div class="emn" id="nt-ps">Watching...</div>
         </div>
 
-        <!-- Locked banner -->
-        <div class="ev-locked-banner">
-          <div class="ev-locked-icon">🔒</div>
-          <div class="ev-locked-title">Results locked</div>
-          <div class="ev-locked-sub">Detailed scores &amp; rubric analysis revealed after<br><strong>End &amp; Evaluate</strong></div>
+        <div class="evm">
+          <div class="eml">Communication</div>
+          <div class="ems sm" id="sc-cm">—</div>
+          <div class="embar"><div class="emf fm" id="fl-cm" style="width:0%"></div></div>
+          <div class="emn" id="nt-cm">Start explaining</div>
         </div>
 
-        <!-- Pressure meter (useful live signal, not a score) -->
+        <div class="evm">
+          <div class="eml">Code / Design quality</div>
+          <div class="ems sm" id="sc-cq">—</div>
+          <div class="embar"><div class="emf fm" id="fl-cq" style="width:0%"></div></div>
+          <div class="emn" id="nt-cq">Write code to evaluate</div>
+        </div>
+
+        <div class="evm">
+          <div class="eml">Time management</div>
+          <div class="ems sg" id="sc-tm">Good</div>
+          <div class="embar"><div class="emf fg" id="fl-tm" style="width:78%"></div></div>
+          <div class="emn" id="nt-tm">On track</div>
+        </div>
+
         <div class="pz">
           <div class="pzl">Interview pressure</div>
           <div class="pzbar"><div class="pzf pz-lo" id="pzf" style="width:18%"></div></div>
           <div class="pzlbl pz-lo" id="pzlbl">Low — warming up</div>
         </div>
 
-        <!-- Voice waveform -->
+        <!-- Speech waveform -->
         <div class="evm" style="padding:0.45rem">
-          <div class="eml" style="margin-bottom:5px">Voice activity</div>
+          <div class="eml" style="margin-bottom:5px">Speech</div>
           <div class="wvfrm" id="wvfrm" aria-hidden="true">
             <div class="wb3"></div><div class="wb3"></div><div class="wb3"></div>
             <div class="wb3"></div><div class="wb3"></div><div class="wb3"></div>
@@ -503,33 +497,6 @@
           <div class="spst">
             <div class="ss"><div class="ssn" id="wpm">—</div><div class="ssl">WPM</div></div>
             <div class="ss"><div class="ssn" id="fill">—</div><div class="ssl">Fillers</div></div>
-          </div>
-        </div>
-
-        <!-- Live communication log (counts, not scores) -->
-        <div class="evm">
-          <div class="eml" style="margin-bottom:6px">Communication log</div>
-          <div class="ev-session-log">
-            <div class="ev-log-row">
-              <span>💬 Words spoken</span>
-              <span class="ev-log-val" id="evl-words">0</span>
-            </div>
-            <div class="ev-log-row">
-              <span>📨 Messages sent</span>
-              <span class="ev-log-val" id="evl-msgs">0</span>
-            </div>
-            <div class="ev-log-row">
-              <span>❓ Clarifying Qs</span>
-              <span class="ev-log-val" id="evl-clarit">0</span>
-            </div>
-            <div class="ev-log-row">
-              <span>🗣️ Filler words</span>
-              <span class="ev-log-val ev-log-filler" id="evl-fillers">0</span>
-            </div>
-            <div class="ev-log-row">
-              <span>🔇 Silence nudges</span>
-              <span class="ev-log-val" id="evl-silence">0</span>
-            </div>
           </div>
         </div>
 
@@ -590,57 +557,6 @@
 
 <div id="toast" role="status" aria-live="polite"></div>
 
-<!-- ════════════════════════════════════════════════════════════════════
-     API KEY SETUP MODAL
-══════════════════════════════════════════════════════════════════════ -->
-<div id="api-key-modal" role="dialog" aria-modal="true" aria-labelledby="akm-title"
-     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;
-            align-items:center;justify-content:center;">
-  <div style="background:var(--srf);border:1px solid var(--brd);border-radius:14px;
-              padding:2rem;max-width:420px;width:90%;display:flex;flex-direction:column;gap:1.2rem">
-
-    <div>
-      <div style="font-size:1.5rem;margin-bottom:0.25rem">🔑</div>
-      <div id="akm-title" style="font-size:1rem;font-weight:700;color:var(--fg)">Anthropic API Key</div>
-      <div style="font-size:0.75rem;color:var(--mut);margin-top:0.3rem;line-height:1.6">
-        This platform calls Claude directly from your browser.
-        Your key is stored only in <code>localStorage</code> — never sent anywhere except Anthropic.
-      </div>
-    </div>
-
-    <div id="akm-error" style="display:none;font-size:0.72rem;color:#ef4444;
-         background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
-         border-radius:6px;padding:8px 10px"></div>
-
-    <div style="display:flex;flex-direction:column;gap:0.5rem">
-      <label style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;
-                    font-weight:600;color:var(--mut)">API Key</label>
-      <input id="akm-input" type="password"
-             placeholder="sk-ant-api03-..."
-             style="background:var(--bg);border:1px solid var(--brd);border-radius:8px;
-                    padding:0.6rem 0.8rem;color:var(--fg);font-size:0.85rem;outline:none;
-                    font-family:monospace"
-             onkeydown="if(event.key==='Enter') saveApiKey()"/>
-    </div>
-
-    <div style="font-size:0.7rem;color:var(--mut);line-height:1.6">
-      Get a key at
-      <a href="https://console.anthropic.com/settings/keys" target="_blank"
-         style="color:var(--acc2)">console.anthropic.com</a>.
-      Free tier works fine for practice sessions.
-    </div>
-
-    <button onclick="saveApiKey()"
-            style="background:var(--acc2);color:#fff;border:none;border-radius:8px;
-                   padding:0.65rem 1.2rem;font-size:0.82rem;font-weight:600;cursor:pointer;
-                   transition:opacity .15s"
-            onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-      Save &amp; Continue →
-    </button>
-
-  </div>
-</div>
-
 
 <!-- ════════════════════════════════════════════════════════════════════
      SCRIPTS — load order matters:
@@ -659,39 +575,6 @@
 
 <!-- Inline glue: small helpers that don't warrant their own file -->
 <script>
-/**
- * API key modal helpers
- */
-function showApiKeyModal(errMsg) {
-  const modal = document.getElementById('api-key-modal');
-  const errEl = document.getElementById('akm-error');
-  if (errMsg) {
-    errEl.textContent = errMsg;
-    errEl.style.display = 'block';
-  } else {
-    errEl.style.display = 'none';
-  }
-  modal.style.display = 'flex';
-  setTimeout(() => document.getElementById('akm-input')?.focus(), 50);
-}
-
-function saveApiKey() {
-  const val = document.getElementById('akm-input')?.value.trim();
-  if (!val || !val.startsWith('sk-ant-')) {
-    document.getElementById('akm-error').textContent =
-      'Key must start with sk-ant- — double-check and try again.';
-    document.getElementById('akm-error').style.display = 'block';
-    return;
-  }
-  localStorage.setItem('anthropic_api_key', val);
-  window._ANTHROPIC_KEY = val;
-  document.getElementById('api-key-modal').style.display = 'none';
-  document.getElementById('akm-input').value = '';
-  // Show a toast confirmation
-  const t = document.getElementById('toast');
-  if (t) { t.textContent = '✓ API key saved'; t.className = 'show'; setTimeout(() => t.className = '', 2500); }
-}
-
 /**
  * runCodeSimulate — simulate code execution via Claude.
  * Runs in O(1) DOM ops; result displayed in #otxt.

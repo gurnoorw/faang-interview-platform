@@ -231,9 +231,4 @@ window.addEventListener('DOMContentLoaded', () => {
       if (e.target === modal) closeEditModal();
     });
   }
-
-  // Show API key modal on first run (no key stored yet)
-  if (!localStorage.getItem('anthropic_api_key') && !window._ANTHROPIC_KEY) {
-    showApiKeyModal();
-  }
 });
