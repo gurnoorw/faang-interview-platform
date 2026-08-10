@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Subscribe — FAANG Interview Pro</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d0d12;--bg2:#13131e;--bg3:#1a1a28;--bdr:rgba(124,111,255,0.18);
+      --acc:#7c6fff;--acc2:#a78bfa;--grn:#22c55e;--red:#ef4444;
+      --txt:#eeeeff;--mut:#6868a0;--sans:'Plus Jakarta Sans',sans-serif;
+    }
+    body{background:var(--bg);color:var(--txt);font-family:var(--sans);
+      min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;
+      background:radial-gradient(ellipse at 50% 0%,rgba(124,111,255,0.1) 0%,transparent 60%),var(--bg)}
+    .card{background:var(--bg2);border:1px solid var(--bdr);border-radius:18px;padding:2rem;width:100%;max-width:440px}
+    .logo{font-size:1rem;font-weight:800;text-align:center;margin-bottom:1.5rem;
+      background:linear-gradient(135deg,#fff 20%,var(--acc2) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    h1{font-size:1.3rem;font-weight:700;text-align:center;margin-bottom:0.35rem}
+    .sub{font-size:0.8rem;color:var(--mut);text-align:center;margin-bottom:1.5rem}
+    .plan-box{background:var(--bg3);border:1px solid var(--bdr);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem}
+    .plan-name{font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--acc2);font-weight:700;margin-bottom:0.5rem}
+    .plan-price{font-size:2rem;font-weight:800;margin-bottom:0.3rem}
+    .plan-period{font-size:0.78rem;color:var(--mut)}
+    .features{list-style:none;margin-top:1rem;display:flex;flex-direction:column;gap:6px}
+    .features li{font-size:0.78rem;display:flex;align-items:flex-start;gap:7px;line-height:1.4}
+    .features li::before{content:'✓';color:var(--grn);font-weight:700;flex-shrink:0}
+    .pay-btn{width:100%;background:var(--acc);border:none;color:white;
+      font-family:var(--sans);font-size:0.95rem;font-weight:700;
+      padding:13px;border-radius:10px;cursor:pointer;transition:all 0.15s;margin-top:0.5rem}
+    .pay-btn:hover:not(:disabled){background:var(--acc2)}
+    .pay-btn:disabled{opacity:0.5;cursor:not-allowed}
+    .secure{display:flex;align-items:center;justify-content:center;gap:5px;
+      font-size:0.7rem;color:var(--mut);margin-top:0.75rem}
+    .err{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;
+      padding:8px 12px;font-size:0.78rem;color:#fca5a5;display:none;margin-bottom:0.75rem}
+    .success-state{text-align:center;padding:1rem 0;display:none}
+    .success-icon{font-size:3rem;margin-bottom:1rem}
+    .success-title{font-size:1.2rem;font-weight:700;margin-bottom:0.5rem}
+    .success-sub{font-size:0.82rem;color:var(--mut);margin-bottom:1.5rem;line-height:1.6}
+    .go-btn{display:inline-block;background:var(--acc);color:white;text-decoration:none;
+      font-family:var(--sans);font-size:0.9rem;font-weight:700;padding:12px 28px;border-radius:10px}
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">FAANG Interview Pro</div>
+
+  <!-- Payment state -->
+  <div id="pay-state">
+    <h1>Complete your subscription</h1>
+    <p class="sub">You're one step away from unlimited FAANG interview practice</p>
+
+    <div class="err" id="pay-err"></div>
+
+    <div class="plan-box">
+      <div class="plan-name">Pro Monthly Plan</div>
+      <div class="plan-price">₹2,000</div>
+      <div class="plan-period">per month · cancel anytime</div>
+      <ul class="features">
+        <li>Unlimited interviews — all 5 round types</li>
+        <li>Adversarial AI interviewers (Amazon, Google, Meta styles)</li>
+        <li>Live code review every 9 seconds</li>
+        <li>Detailed 8-section feedback report</li>
+        <li>Whiteboard for design rounds</li>
+        <li>AI Knowledge learning round with model solutions</li>
+        <li>Add custom questions via Interviewer Mode</li>
+      </ul>
+    </div>
+
+    <button class="pay-btn" id="pay-btn" onclick="startPayment()">
+      Pay ₹2,000 with Razorpay →
+    </button>
+    <div class="secure">🔒 Secured by Razorpay · UPI / Cards / Net Banking supported</div>
+  </div>
+
+  <!-- Success state -->
+  <div class="success-state" id="success-state">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">You're subscribed!</div>
+    <div class="success-sub">Your subscription is active for 30 days. Time to start cracking those FAANG interviews.</div>
+    <a class="go-btn" href="../index.html">Start Practising →</a>
+  </div>
+</div>
+
+<script>
+  const API_BASE = window.API_BASE || 'http://localhost:3001';
+  const token    = localStorage.getItem('faang_token');
+
+  // Redirect to login if not authenticated
+  if (!token) window.location.href = 'auth.html?mode=login';
+
+  function showErr(msg) {
+    const el = document.getElementById('pay-err');
+    el.textContent = msg; el.style.display = 'block';
+  }
+
+  async function startPayment() {
+    const btn = document.getElementById('pay-btn');
+    btn.disabled = true; btn.textContent = 'Creating order...';
+    document.getElementById('pay-err').style.display = 'none';
+
+    try {
+      // 1. Create Razorpay order on server
+      const res  = await fetch(`${API_BASE}/api/payment/create-order`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showErr(data.error || 'Could not create payment order.');
+        btn.disabled = false; btn.textContent = 'Pay ₹2,000 with Razorpay →';
+        return;
+      }
+
+      // 2. Open Razorpay checkout popup
+      const rzp = new Razorpay({
+        key:         data.keyId,
+        amount:      data.amount,
+        currency:    data.currency,
+        order_id:    data.orderId,
+        name:        'FAANG Interview Pro',
+        description: 'Monthly Subscription',
+        image:       '/favicon.ico',
+        prefill: {
+          name:  data.userName,
+          email: data.userEmail,
+        },
+        theme: { color: '#7c6fff' },
+
+        handler: async (response) => {
+          // 3. Verify payment signature on server → activate subscription
+          btn.textContent = 'Verifying payment...';
+          try {
+            const vRes  = await fetch(`${API_BASE}/api/payment/verify`, {
+              method:  'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+              body: JSON.stringify({
+                razorpay_order_id:   response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature:  response.razorpay_signature,
+              }),
+            });
+            const vData = await vRes.json();
+
+            if (vRes.ok && vData.success) {
+              document.getElementById('pay-state').style.display    = 'none';
+              document.getElementById('success-state').style.display = 'block';
+            } else {
+              showErr(vData.error || 'Payment verification failed. Please contact support.');
+              btn.disabled = false; btn.textContent = 'Pay ₹2,000 with Razorpay →';
+            }
+          } catch (e) {
+            showErr('Verification error. Please contact support with your payment ID: ' + response.razorpay_payment_id);
+            btn.disabled = false; btn.textContent = 'Pay ₹2,000 with Razorpay →';
+          }
+        },
+
+        modal: {
+          ondismiss: () => {
+            btn.disabled = false; btn.textContent = 'Pay ₹2,000 with Razorpay →';
+          },
+        },
+      });
+
+      rzp.open();
+
+    } catch (e) {
+      showErr('Network error — please try again.');
+      btn.disabled = false; btn.textContent = 'Pay ₹2,000 with Razorpay →';
+    }
+  }
+</script>
+</body>
+</html>
