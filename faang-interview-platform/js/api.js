@@ -19,6 +19,16 @@ let _callPending = false;
  * @param {number} [maxTokens]
  * @returns {Promise<string|null>}
  */
+function getApiKey() {
+  if (CONFIG.API_KEY) return CONFIG.API_KEY;
+  let k = localStorage.getItem('faang_api_key');
+  if (!k) {
+    k = (window.prompt('Enter your Anthropic API key (stored only in this browser):') || '').trim();
+    if (k) localStorage.setItem('faang_api_key', k);
+  }
+  return k;
+}
+
 async function callClaude(messages, systemPrompt, maxTokens = CONFIG.API_MAX_TOKENS) {
   const now = Date.now();
 
@@ -38,12 +48,22 @@ async function callClaude(messages, systemPrompt, maxTokens = CONFIG.API_MAX_TOK
 
     const res  = await fetch(CONFIG.API_URL, {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': getApiKey(),
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
       body:    JSON.stringify(body),
     });
 
     const data = await res.json();
     _callPending = false;
+    if (!res.ok) {
+      console.error('[API] error', res.status, data);
+      if (res.status === 401) localStorage.removeItem('faang_api_key');
+      return null;
+    }
 
     return data?.content?.[0]?.text ?? null;
   } catch (err) {
