@@ -8,7 +8,8 @@
 const CONFIG = {
   /* ── Anthropic API ─────────────────────────────────────────────────── */
   API_URL:   'https://api.anthropic.com/v1/messages',
-  API_MODEL: 'claude-sonnet-4-20250514',
+  API_MODEL: 'claude-sonnet-5-5',      // change only here when a newer model ships
+  API_KEY:   '',                    // leave empty; key is asked once and kept in localStorage
   API_MAX_TOKENS: 900,              // default response budget
 
   /* ── Rate limiting ──────────────────────────────────────────────────── */
