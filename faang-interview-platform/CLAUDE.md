@@ -115,8 +115,30 @@ Steps:
    - `A @` → Netlify
    - `CNAME www` → `<site>.netlify.app`
    - `CNAME api` → `<service>.onrender.com`
-   - No AAAA records, because Render requires that.
+   - No AAAA records (Render rejects domains that have them).
 6. Verify `/api/health`.
 7. Test signup → Razorpay **test-mode** payment → interview.
 
 The Render free tier sleeps when idle, so the first request after a pause is slow.
+
+## Job Hunt Tracker logging
+
+Each coding session is logged to a job-hunt tracker. A nightly task reads the log from GitHub, so it only counts once pushed.
+
+- At the start of a session, run `date '+%Y-%m-%d %H:%M'` (IST) and note it. If it isn't obvious which task we're on, ask:
+  - `p01` run it end to end locally and confirm the model ID
+  - `p02` deploy the free demo (Netlify + Render + Atlas, Razorpay test mode)
+  - `p03` load your own question bank
+  - `p04` README with diagram, demo GIF, live link
+  - `p05` 2-minute story, then freeze
+- At the end of a session, or when the user says "log it", append ONE line to `.tracker/sessions.jsonl` **at the git root** (`../.tracker/`; create it if missing):
+  ```
+  {"id":"<YYYY-MM-DD>-<task>-<n>","date":"<YYYY-MM-DD IST>","project":"platform","task":"<p0x>","minutes":<int>,"status":"In progress|Done","demo":"No|Yes","note":"<one line: what works now, what's left>"}
+  ```
+  - `<n>`: 1 for the first session on that task that day, then 2, 3, …
+  - `minutes`: real elapsed time since the session start, minus breaks the user mentions. If the user gives a number, use theirs. Never estimate otherwise; ask.
+  - `status`: "Done" only when the user says the task is done AND it works. Otherwise "In progress".
+  - `demo`: "Yes" only when the user has seen the feature working end to end.
+  - `note`: facts about the code only.
+- Commit the line with the code (`chore(tracker): log session <id>`) and push. If the push fails, say so: an unpushed line never reaches the tracker.
+- Never edit or delete earlier lines; append a new one to correct something.
